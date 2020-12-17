@@ -1,6 +1,16 @@
 # spork
 Amp communications investigation. See example python code under Examples.
 
+
+See other projects also investigating the Spark amp data communication:
+
+https://github.com/jrnelson90/tinderboxpedal
+
+https://github.com/ytsibizov/midibox
+
+https://github.com/paulhamsh/Spark-Parser/ see: https://github.com/paulhamsh/Spark-Parser/blob/main/Spark%20Format%20Description.md
+
+
 ## Random sampling of serial port data:
 
 
