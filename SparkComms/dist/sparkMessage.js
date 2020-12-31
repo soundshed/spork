@@ -10,11 +10,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var enc = new TextEncoder();
 function bytes(val) {
     if (typeof (val) == 'string') {
-        for (let i = 0; i < val.length; i++) {
-            console.log(val.charCodeAt(i));
-        }
         let b = enc.encode(val);
-        console.log(buf2hex(b));
+        try {
+            console.log(buf2hex(b));
+        }
+        catch (_a) {
+            //
+            console.log(val + "Could not be encoded");
+        }
         return b;
     }
     else {
@@ -27,7 +30,7 @@ function buf2hex(buffer) {
     return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
 }
 function len(val) {
-    return val.byteLength;
+    return enc.encode(val).byteLength;
 }
 // Helper functions to package a command for the Spark (handles the 'format bytes')
 class SparkMessage {
@@ -50,10 +53,13 @@ class SparkMessage {
         this.split_data7 = [];
         this.final_message = [];
     }
+    buf2hex(b) {
+        return buf2hex(b);
+    }
     end_message() {
         // determine how many chunks there are
         let data_len = this.data.byteLength;
-        let num_chunks = (data_len + 0x7f) / 0x80;
+        let num_chunks = Math.ceil((data_len + 0x7f) / 0x80);
         // split the data into chunks of maximum 0x80 bytes (still 8 bit bytes)
         // and add a chunk sub-header if a multi-chunk message
         for (let this_chunk = 0; this_chunk < num_chunks; this_chunk++) {
@@ -98,10 +104,10 @@ class SparkMessage {
         let block_filler = bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00');
         let chunk_header = bytes('\xf0\x01\x3a\x15');
         for (let chunk of this.split_data7) {
-            let block_size = chunk.length + 16 + 6 + 1;
-            let header = this.mergeBytes(block_header, bytes([block_size]), block_filler, chunk_header, bytes([this.cmd]), bytes([this.sub_cmd]));
+            let block_size = chunk.byteLength + 16 + 6 + 1;
+            let header = this.mergeBytes(block_header, bytes(block_size), block_filler, chunk_header, bytes(this.cmd), bytes(this.sub_cmd));
             let trailer = bytes('\xf7');
-            this.final_message = this.mergeBytes(this.final_message, header, chunk, trailer);
+            this.final_message.push(this.mergeBytes(this.final_message, header, chunk, trailer));
         }
         return this.final_message;
     }
@@ -111,14 +117,14 @@ class SparkMessage {
     }
     add_prefixed_string(pack_str) {
         this.add_bytes(bytes(len(pack_str)));
-        this.add_bytes(this.mergeBytes([bytes([len(pack_str) + 0x20]), bytes(pack_str)]));
+        this.add_bytes(this.mergeBytes(bytes(len(pack_str) + 0xa0), bytes(pack_str)));
     }
     add_string(pack_str) {
-        this.add_bytes(this.mergeBytes([bytes([len(pack_str) + 0x20]), bytes(pack_str)]));
+        this.add_bytes(this.mergeBytes(bytes(len(pack_str) + 0xa0), bytes(pack_str)));
     }
     add_long_string(pack_str) {
         this.add_bytes(bytes('\xd9'));
-        this.add_bytes(this.mergeBytes([bytes([len(pack_str)]), bytes(pack_str)]));
+        this.add_bytes(this.mergeBytes(bytes(len(pack_str)), bytes(pack_str)));
     }
     add_float(flt) {
         //TODO: struct pack
@@ -191,15 +197,15 @@ class SparkMessage {
         for (let i = 0; i < 7; i++) {
             this.add_string(preset["Pedals"][i]["Name"]);
             this.add_onoff(preset["Pedals"][i]["OnOff"]);
-            let num_p = len(preset["Pedals"][i]["Parameters"]);
-            this.add_bytes(bytes([num_p + 0x90]));
+            let num_p = preset["Pedals"][i]["Parameters"].length;
+            this.add_bytes(bytes(num_p + 0x90));
             for (let p = 0; p < num_p; p++) {
-                this.add_bytes(bytes([p]));
-                this.add_bytes(bytes('\x91'));
+                this.add_bytes(bytes(p));
+                this.add_bytes(bytes('\x90'));
                 this.add_float(preset["Pedals"][i]["Parameters"][p]);
             }
         }
-        this.add_bytes(bytes([preset["End Filler"]]));
+        this.add_bytes(bytes(preset["End Filler"]));
         return this.end_message();
     }
     // utils

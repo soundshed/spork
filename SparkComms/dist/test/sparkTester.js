@@ -176,12 +176,14 @@ for (let i = 0; i < preset_list.length; i++) {
     for (let x = 0; x < b.length; x++) {
         if (toHex(b[x]) != preset_listh[i][x]) {
             console.log(`Preset ${preset_list[i]["Name"]} failed test in block ${x}`);
-            console.log(`Preset ${preset_list[i]["Name"]} failed test in block ${x}`);
+            console.log("computed:" + toHex(b[x]));
+            console.log("expected:" + preset_listh[i][x]);
+            console.log("---------");
             process.exit(1);
         }
     }
 }
 function toHex(val) {
-    return val.toString(16);
+    return Buffer.from(val).toString('hex');
 }
 //# sourceMappingURL=sparkTester.js.map
