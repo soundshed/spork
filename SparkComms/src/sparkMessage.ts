@@ -99,7 +99,7 @@ export class SparkMessage {
         for (let chunk of this.split_data8) {
 
             let chunk_len = chunk.byteLength
-            let num_seq = ((chunk_len + 6) / 7)
+            let num_seq = Math.floor(((chunk_len + 6) / 7))
             let bytes7 = Uint8Array.from([])
 
             for (let this_seq = 0; this_seq < num_seq; this_seq++) {
@@ -159,12 +159,8 @@ export class SparkMessage {
     }
 
     add_float(flt) {
-        // float is a prefix of 0xCA with four bytes for float value (packed C struct)
-        // https://stackoverflow.com/questions/60816022/conversion-for-hex-to-float-big-endian-abcd-in-js
+        // float is a prefix of 0xCA with four bytes for float value (packed C struct), convert to js Float32 then reverse bytes
 
-       /* const sign = flt >> 31 ? -1 : 1;
-        const exponent = (flt >> 23) & 0xFF;
-        let bigEndianSinglePrecisionFloat = sign * (flt & 0x7fffff | 0x800000) * 1.0 / Math.pow(2, 23) * Math.pow(2, (exponent - 127));*/
         let floatArray=new Float32Array(1);
         floatArray[0]=flt;
 

@@ -75,7 +75,7 @@ class SparkMessage {
         // and then add bit8 and the 7-bit sequence to data7
         for (let chunk of this.split_data8) {
             let chunk_len = chunk.byteLength;
-            let num_seq = ((chunk_len + 6) / 7);
+            let num_seq = Math.floor(((chunk_len + 6) / 7));
             let bytes7 = Uint8Array.from([]);
             for (let this_seq = 0; this_seq < num_seq; this_seq++) {
                 let seq_len = Math.min(7, chunk_len - (this_seq * 7));
