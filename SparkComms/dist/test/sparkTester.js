@@ -181,6 +181,9 @@ for (let i = 0; i < preset_list.length; i++) {
             console.log("---------");
             process.exit(1);
         }
+        else {
+            console.log(`Preset ${preset_list[i]["Name"]} matches test value`);
+        }
     }
 }
 function toHex(val) {

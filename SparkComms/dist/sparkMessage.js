@@ -11,18 +11,14 @@ var enc = new TextEncoder();
 function bytes(val) {
     if (typeof (val) == 'string') {
         let b = enc.encode(val);
-        try {
-            console.log(buf2hex(b));
-        }
-        catch (_a) {
-            //
-            console.log(val + "Could not be encoded");
-        }
+        return b;
+    }
+    else if (typeof (val) == 'number') {
+        let b = Uint8Array.from([val]);
         return b;
     }
     else {
         let b = Uint8Array.from(val);
-        console.log(buf2hex(b));
         return b;
     }
 }
@@ -59,7 +55,7 @@ class SparkMessage {
     end_message() {
         // determine how many chunks there are
         let data_len = this.data.byteLength;
-        let num_chunks = Math.ceil((data_len + 0x7f) / 0x80);
+        let num_chunks = Math.floor((data_len + 0x7f) / 0x80);
         // split the data into chunks of maximum 0x80 bytes (still 8 bit bytes)
         // and add a chunk sub-header if a multi-chunk message
         for (let this_chunk = 0; this_chunk < num_chunks; this_chunk++) {
@@ -78,7 +74,7 @@ class SparkMessage {
         // and extract the 8th bit and put in 'bit8'
         // and then add bit8 and the 7-bit sequence to data7
         for (let chunk of this.split_data8) {
-            let chunk_len = chunk.length;
+            let chunk_len = chunk.byteLength;
             let num_seq = ((chunk_len + 6) / 7);
             let bytes7 = Uint8Array.from([]);
             for (let this_seq = 0; this_seq < num_seq; this_seq++) {
@@ -86,28 +82,26 @@ class SparkMessage {
                 let bit8 = 0;
                 let seq = Uint8Array.from([]);
                 for (let ind = 0; ind < seq_len; ind++) {
-                    let dat = chunk.subarray(this_seq * 7 + ind, this_seq * 7 + ind + 1);
-                    /* if (dat & 0x80 == 0x80)
-                     {
-                         bit8 |= (1<<ind)
-                     }
-                     dat &= 0x7f
-                     */
-                    seq = this.mergeBytes(seq, dat);
+                    let dat = chunk.subarray(this_seq * 7 + ind, this_seq * 7 + ind + 1)[0];
+                    if ((dat & 0x80) == 0x80) {
+                        bit8 |= (1 << ind);
+                    }
+                    dat &= 0x7f;
+                    seq = this.mergeBytes(seq, [dat]);
                 }
-                bytes7 = this.mergeBytes(bytes7, Uint8Array.from([bit8]), seq);
+                bytes7 = this.mergeBytes(bytes7, bytes(bit8), seq);
             }
             this.split_data7.push(bytes7);
         }
         // now we can create the final message with the message header and the chunk header
-        let block_header = bytes('\x01\xfe\x00\x00\x53\xfe');
-        let block_filler = bytes('\x00\x00\x00\x00\x00\x00\x00\x00\x00');
-        let chunk_header = bytes('\xf0\x01\x3a\x15');
+        let block_header = bytes([0x01, 0xfe, 0x00, 0x00, 0x53, 0xfe]);
+        let block_filler = bytes([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+        let chunk_header = bytes([0xf0, 0x01, 0x3a, 0x15]);
         for (let chunk of this.split_data7) {
             let block_size = chunk.byteLength + 16 + 6 + 1;
             let header = this.mergeBytes(block_header, bytes(block_size), block_filler, chunk_header, bytes(this.cmd), bytes(this.sub_cmd));
-            let trailer = bytes('\xf7');
-            this.final_message.push(this.mergeBytes(this.final_message, header, chunk, trailer));
+            let trailer = bytes(0xf7);
+            this.final_message.push(this.mergeBytes(header, chunk, trailer));
         }
         return this.final_message;
     }
@@ -123,20 +117,28 @@ class SparkMessage {
         this.add_bytes(this.mergeBytes(bytes(len(pack_str) + 0xa0), bytes(pack_str)));
     }
     add_long_string(pack_str) {
-        this.add_bytes(bytes('\xd9'));
+        this.add_bytes(bytes(0xd9));
         this.add_bytes(this.mergeBytes(bytes(len(pack_str)), bytes(pack_str)));
     }
     add_float(flt) {
-        //TODO: struct pack
-        this.add_bytes(bytes(flt));
+        // float is a prefix of 0xCA with four bytes for float value (packed C struct)
+        // https://stackoverflow.com/questions/60816022/conversion-for-hex-to-float-big-endian-abcd-in-js
+        /* const sign = flt >> 31 ? -1 : 1;
+         const exponent = (flt >> 23) & 0xFF;
+         let bigEndianSinglePrecisionFloat = sign * (flt & 0x7fffff | 0x800000) * 1.0 / Math.pow(2, 23) * Math.pow(2, (exponent - 127));*/
+        let floatArray = new Float32Array(1);
+        floatArray[0] = flt;
+        this.add_bytes(bytes(0xca));
+        var floatBytes = new Uint8Array(floatArray.buffer).reverse();
+        this.add_bytes(floatBytes);
     }
     add_onoff(onoff) {
         let b;
         if (onoff == "On") {
-            b = bytes('\xc3');
+            b = bytes(0xc3);
         }
         else {
-            b = bytes('\xc2');
+            b = bytes(0xc2);
         }
         this.add_bytes(b);
     }
@@ -179,8 +181,7 @@ class SparkMessage {
         const cmd = 0x01;
         const sub_cmd = 0x01;
         this.start_message(cmd, sub_cmd, true);
-        bytes('abc');
-        this.add_bytes(bytes('\x00\x7f'));
+        this.add_bytes(bytes([0x00, 0x7f]));
         this.add_long_string(preset["UUID"]);
         this.add_string(preset["Name"]);
         this.add_string(preset["Version"]);
@@ -192,7 +193,7 @@ class SparkMessage {
             this.add_string(descr);
         }
         this.add_string(preset["Icon"]);
-        this.add_float(120); // preset["BPM"]
+        this.add_float(120.0); // preset["BPM"]
         this.add_bytes(bytes(0x90 + 7)); //  always 7 pedals
         for (let i = 0; i < 7; i++) {
             this.add_string(preset["Pedals"][i]["Name"]);
@@ -201,7 +202,7 @@ class SparkMessage {
             this.add_bytes(bytes(num_p + 0x90));
             for (let p = 0; p < num_p; p++) {
                 this.add_bytes(bytes(p));
-                this.add_bytes(bytes('\x90'));
+                this.add_bytes(bytes(0x91));
                 this.add_float(preset["Pedals"][i]["Parameters"][p]);
             }
         }
