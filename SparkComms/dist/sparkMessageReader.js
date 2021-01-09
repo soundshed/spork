@@ -51,7 +51,6 @@ function chr(val) {
 }
 class SparkReadMessage {
     constructor() {
-        this.msg = [];
         this.raw = "";
         this.text = "";
         this.python = "";
@@ -111,7 +110,7 @@ class SparkReadMessage {
         for (let chunk of chunks) {
             let this_cmd = chunk[4];
             let this_sub_cmd = chunk[5];
-            let data7bit = chunk.subarray(6);
+            let data7bit = chunk.subarray(6, chunk.length - 1);
             let chunk_len = len(data7bit);
             let num_seq = Math.floor((chunk_len + 7) / 8);
             let data8bit = bytes([]);
@@ -145,13 +144,13 @@ class SparkReadMessage {
                 concat_data = this.mergeBytes(concat_data, this_data.subarray(3));
                 //if at last chunk of multi-chunk
                 if (this_chunk == num_chunks - 1) {
-                    this.message.push(this.mergeBytes(this_cmd, this_sub_cmd, concat_data));
+                    this.message.push(this.mergeBytes(bytes(this_cmd), bytes(this_sub_cmd), concat_data));
                     concat_data = bytes([]);
                 }
             }
             else {
                 //copy old one
-                this.message.push(this.mergeBytes(this_cmd, this_sub_cmd, this_data));
+                this.message.push(this.mergeBytes(bytes(this_cmd), bytes(this_sub_cmd), this_data));
             }
         }
     }
@@ -189,16 +188,18 @@ class SparkReadMessage {
         }
         return a_str;
     }
-    //floats are special - bit 7 is actually stored in the format byte and not in the data
+    //https://github.com/msgpack/msgpack/blob/master/spec.md#float-format-family
     read_float() {
         const prefix = this.read_byte(); //should be ca
         let val = 0;
-        //TODO: read 4 bytes and convert from big endian float
-        /*const flt_bytes = b''
-        for (let const i in range(0, 4):
-            flt_bytes += bytes([this.read_byte()])
-            [val] = struct.unpack(">f", flt_bytes)*/
-        return val;
+        let flt_bytes = this.msg
+            .subarray(this.msg_pos, this.msg_pos + 4)
+            .reverse()
+            .slice(0);
+        let floatArray = new Float32Array(flt_bytes.buffer);
+        let f = floatArray[0];
+        this.msg_pos += 4;
+        return f;
     }
     read_onoff() {
         const a_byte = this.read_byte();
@@ -400,10 +401,10 @@ class SparkReadMessage {
         console.log(msg);
     }
     interpret_data() {
-        for (let msg in this.message) {
+        for (let msg of this.message) {
             const this_cmd = msg[0];
             const this_sub_cmd = msg[1];
-            const this_data = msg[2];
+            const this_data = msg.subarray(2);
             this.set_interpreter(this_data);
             this.run_interpreter(this_cmd, this_sub_cmd);
         }
