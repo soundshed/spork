@@ -6,6 +6,7 @@
 // Class to package commands to send to Positive Grid Spark
 //
 // Based on https://github.com/paulhamsh/Spark-Parser
+// Note: variable messages are sent using the msgpack structure
 
 var enc = new TextEncoder();
 

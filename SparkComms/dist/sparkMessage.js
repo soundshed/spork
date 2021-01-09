@@ -6,6 +6,7 @@
 // Class to package commands to send to Positive Grid Spark
 //
 // Based on https://github.com/paulhamsh/Spark-Parser
+// Note: variable messages are sent using the msgpack structure
 Object.defineProperty(exports, "__esModule", { value: true });
 var enc = new TextEncoder();
 function bytes(val) {
@@ -121,11 +122,7 @@ class SparkMessage {
         this.add_bytes(this.mergeBytes(bytes(len(pack_str)), bytes(pack_str)));
     }
     add_float(flt) {
-        // float is a prefix of 0xCA with four bytes for float value (packed C struct)
-        // https://stackoverflow.com/questions/60816022/conversion-for-hex-to-float-big-endian-abcd-in-js
-        /* const sign = flt >> 31 ? -1 : 1;
-         const exponent = (flt >> 23) & 0xFF;
-         let bigEndianSinglePrecisionFloat = sign * (flt & 0x7fffff | 0x800000) * 1.0 / Math.pow(2, 23) * Math.pow(2, (exponent - 127));*/
+        // float is a prefix of 0xCA with four bytes for float value (packed C struct), convert to js Float32 then reverse bytes
         let floatArray = new Float32Array(1);
         floatArray[0] = flt;
         this.add_bytes(bytes(0xca));
