@@ -6,7 +6,7 @@ btSerial.on('found', function (address, name) {
         address = "F7:EB:ED:2F:75:BA";
         btSerial.findSerialPortChannel(address, function (channel) {
             btSerial.connect(address, channel, function () {
-                console.log('connected');
+                console.log('connected1');
                 btSerial.write(Buffer.from('my data', 'utf-8'), function (err, bytesWritten) {
                     if (err)
                         console.log(err);
@@ -27,7 +27,7 @@ btSerial.on('found', function (address, name) {
 //btSerial.inquire();
 function connect() {
     btSerial.connect("08:EB:ED:8F:84:0B", 2, function () {
-        console.log('connected');
+        console.log('connected2');
         btSerial.write(Buffer.from('my data', 'utf-8'), function (err, bytesWritten) {
             if (err)
                 console.log(err);

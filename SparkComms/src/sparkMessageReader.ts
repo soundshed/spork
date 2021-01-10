@@ -75,7 +75,7 @@ export class SparkReadMessage {
     }
 
     set_message(msg) {
-        this.data = msg
+        this.data = [msg]
         this.message = []
     }
 

@@ -59,7 +59,7 @@ class SparkReadMessage {
         this.message = [];
     }
     set_message(msg) {
-        this.data = msg;
+        this.data = [msg];
         this.message = [];
     }
     mergeBytes(...arrays) {

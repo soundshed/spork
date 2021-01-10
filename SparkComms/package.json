@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluetooth-serial-port": "^2.2.7"
+    "bluetooth-serial-port": "^2.2.7",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {
     "tslint": "^5.12.1",
