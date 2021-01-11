@@ -1,24 +1,74 @@
 // note that the fs package does not exist on a normal browser
-const {fs, ipcRenderer, ipcMain } = require( "electron");
+const { fs, ipcRenderer, ipcMain } = require("electron");
 
-ipcRenderer.invoke('perform-action', {action:"hello"})
+const PresetsManager = require("./core/presetsManager.js").PresetsManager;
 
-//a dialog box module from electron
-const { dialog } = require("electron").remote;
+const getElement = (id) => {
+  return document.getElementById(id);
+}
 
-// Also note that document does not exist in a normal node environment
-// button click event
-document.getElementById("mybutton").addEventListener("click", () => {
+const log = (msg) => {
+  console.log(msg);
+}
 
-    ipcRenderer.invoke('perform-action', ...args)
+const uiState = {
+  connected: false,
+  deviceName: "",
+  deviceAddress: ""
+}
 
-  /*const data = "Successfully wrote to the desktop"; // the data we want to save to the desktop
 
-  //launch save dialog window
-  dialog.showSaveDialog(filename => {
-    //save file at the destination indicated by filename
-    fs.writeFileSync(filename + ".txt", data, "utf-8", () => {
-      console.log("attempted to write to the desktop");
-    });
-  });*/
+
+let presets = new PresetsManager().getAllPresets();
+
+const setupUIActions = () => {
+  getElement("connect").addEventListener("click", () => {
+    ipcRenderer.invoke('perform-action', { action: 'connect' })
+  });
+
+
+  getElement("applyPreset").addEventListener("click", () => {
+    let presetNumber = Math.floor(Math.random() * presets.length);
+
+    getElement("status").innerText = "Applying preset " + presets[presetNumber].Name;
+
+    ipcRenderer.invoke('perform-action', { action: 'applyPreset', data: presets[presetNumber] })
+  });
+
+  getElement("ch1").addEventListener("click", () => {
+    ipcRenderer.invoke('perform-action', { action: 'setChannel', data: 0 })
+  });
+  getElement("ch2").addEventListener("click", () => {
+    ipcRenderer.invoke('perform-action', { action: 'setChannel', data: 1 })
+  });
+  getElement("ch3").addEventListener("click", () => {
+    ipcRenderer.invoke('perform-action', { action: 'setChannel', data: 2 })
+  });
+  getElement("ch4").addEventListener("click", () => {
+    ipcRenderer.invoke('perform-action', { action: 'setChannel', data: 3 })
+  });
+
+}
+
+ipcRenderer.on('device-state-changed', (event, args) => {
+  log("got device state update from main:" + args);
+  getElement("state").innerText = JSON.stringify(args)
 });
+
+ipcRenderer.on('device-connection-changed', (event, args) => {
+
+  log("got connection event from main:" + args);
+
+  getElement("status").innerText = JSON.stringify(args)
+
+  if (args == "connected") {
+    uiState.connected = true;
+  }
+
+  if (args == "failed") {
+    uiState.connected = false;
+  }
+});
+
+
+setupUIActions();

@@ -57,7 +57,7 @@ function chr(val): string {
     return String.fromCharCode(val);
 }
 
-export class SparkReadMessage {
+export class SparkMessageReader {
     private data: Array<Uint8Array>;
     private message: Array<Uint8Array>;
     private msg: Uint8Array;
@@ -74,8 +74,8 @@ export class SparkReadMessage {
         this.message = []
     }
 
-    set_message(msg) {
-        this.data = [msg]
+    set_message(msgArray) {
+        this.data = msgArray;
         this.message = []
     }
 

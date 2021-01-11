@@ -1,7 +1,7 @@
 "use strict";
 // port of https://github.com/paulhamsh/Spark-Parser/blob/main/SparkClassNew/SparkReaderTester.py
 Object.defineProperty(exports, "__esModule", { value: true });
-const sparkMessageReader_1 = require("../sparkMessageReader");
+const sparkMessageReader_1 = require("../devices/spark/sparkMessageReader");
 const preset_h = [
     "01fe000053fead000000000000000000f0013a15010124030000007f5924003037303739303600332d393441392d00343142312d41420031442d30324342004335443030373902302b53696c7665407220536869702308302e3727312d43106c65616e286963406f6e2e706e674a3242700000172e62006961732e6e6f6940736567617465424d1300114a3e0d210d6c01114a3e66080d5102114a0000000200284c41324143186f6d704313f7",
     "01fe000053fead000000000000000000f0013a1501013403010000114a003000000001114a3f305a367e02114a3e093f034b27426f6f307374657242110073114a3f387b4a2b00526f6c616e644a304331323043150033114a3f215964012b114a3e104a360223114a3e22285d0333114a3f2b5b210463114a3f4e476d2640436c6f6e6572430d1200114a3e4c620c1b01114a00000002002c56696e746100676544656c61791b421400114af7",
@@ -14,7 +14,7 @@ for (let h of preset_h) {
     let bytes = fromHexString(h);
     preset_snd.push(bytes);
 }
-let reader = new sparkMessageReader_1.SparkReadMessage();
+let reader = new sparkMessageReader_1.SparkMessageReader();
 reader.set_message(preset_snd);
 let b = reader.read_message();
 console.log(b);

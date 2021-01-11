@@ -1,4 +1,4 @@
-import { SparkAPI } from "../sparkAPI";
+import { SparkAPI } from "../devices/spark/sparkAPI";
 
 let api = new SparkAPI();
 

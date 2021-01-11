@@ -2,18 +2,37 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Soundshed - Tone Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manager</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link href="./node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./css/styles.css" rel="stylesheet">
 </head>
-<body style="background: white;">
-    <h1>App</h1>
-    <p>
-        We are using node <script>document.write(process.versions.node)</script>,
-        Chrome <script>document.write(process.versions.chrome)</script>,
-        and Electron <script>document.write(process.versions.electron)</script>.
-    </p>
+<body>
+    <div class="container mx-auto">
+        <h1>Manager</h1>
+        <p>
+            System: node <script>document.write(process.versions.node)</script>,
+            Chrome <script>document.write(process.versions.chrome)</script>,
+            and Electron <script>document.write(process.versions.electron)</script>.
+        </p>
+    
+        <button id="connect">Connect</button>
 
-    <button id="mybutton">Connect</button>
+
+        <button id="applyPreset">Set Preset</button>
+
+        <button id="ch1">1</button>
+        <button id="ch2">2</button>
+        <button id="ch3">3</button>
+        <button id="ch4">4</button>
+
+        <div id="status">Not connected</div>
+
+
+        <div id="state">---</div>
+      </div>
+    
 </body>
 
 

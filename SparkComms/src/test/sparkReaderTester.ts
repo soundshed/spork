@@ -1,6 +1,6 @@
 // port of https://github.com/paulhamsh/Spark-Parser/blob/main/SparkClassNew/SparkReaderTester.py
 
-import { SparkReadMessage } from "../sparkMessageReader";
+import { SparkMessageReader } from "../devices/spark/sparkMessageReader";
 
 const preset_h = [
     "01fe000053fead000000000000000000f0013a15010124030000007f5924003037303739303600332d393441392d00343142312d41420031442d30324342004335443030373902302b53696c7665407220536869702308302e3727312d43106c65616e286963406f6e2e706e674a3242700000172e62006961732e6e6f6940736567617465424d1300114a3e0d210d6c01114a3e66080d5102114a0000000200284c41324143186f6d704313f7",
@@ -19,7 +19,7 @@ for (let h of preset_h) {
 }
 
 
-let reader = new SparkReadMessage()
+let reader = new SparkMessageReader()
 reader.set_message(preset_snd)
 let b = reader.read_message()
 

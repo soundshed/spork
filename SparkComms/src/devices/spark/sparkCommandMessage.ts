@@ -35,7 +35,7 @@ function len(val: string): number {
 }
 
 // Helper functions to package a command for the Spark (handles the 'format bytes')
-export class SparkMessage {
+export class SparkCommandMessage {
 
     private cmd: number;
     private sub_cmd: number;

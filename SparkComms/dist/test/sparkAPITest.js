@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const sparkAPI_1 = require("../sparkAPI");
+const sparkAPI_1 = require("../devices/spark/sparkAPI");
 let api = new sparkAPI_1.SparkAPI();
 api.login("", "").then((result) => __awaiter(this, void 0, void 0, function* () {
     let user = yield api.getUserInfo();
