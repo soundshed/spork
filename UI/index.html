@@ -35,10 +35,41 @@
 
 
         <div id="state">---</div>
+
+        <div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+        <label>Gain</label>
+    </div>
+    <div class="col-sm">
+        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+        <label>Bass</label>
+    </div>
+    <div class="col-sm">
+        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+        <label>Mid</label>
+    </div>
+    <div class="col-sm">
+        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+        <label>Treble</label>
+    </div>
+  </div>
+</div>
+
+           
+    <webaudio-slider></webaudio-slider>
+    <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+    <webaudio-param link="knob-1"></webaudio-param>
+        </div>
     </div>
 
+    
 </body>
 
+<script src="./lib/webaudio-controls/webaudio-controls.js"></script>
 
 <script src="./app.js"></script>
 

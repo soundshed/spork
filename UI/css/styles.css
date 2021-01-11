@@ -1,3 +1,13 @@
+body {
+    background-color: rgb(39, 38, 38);
+    color: whitesmoke;
+}
 h1 {
     font-size:140%
+}
+
+label{
+    display: block;
+    font-size:0.6em;
+    margin-left:2em;
 }
