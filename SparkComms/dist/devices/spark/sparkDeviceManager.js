@@ -14,68 +14,25 @@ class SparkDeviceManager {
     constructor(deviceAddress) {
         this.latestStateReceived = [];
         this.lastStateTime = new Date().getTime();
-        this.deviceAddress = "08:EB:ED:8F:84:0B";
+        this.deviceAddress = "";
         this.deviceAddress = deviceAddress;
         this.btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
         this.btSerial.on('data', (buffer) => {
             let currentTime = new Date().getTime();
             let timeDelta = currentTime - this.lastStateTime;
             this.lastStateTime = currentTime;
-            if (timeDelta > 100) {
-                this.log('Receive: Starting new message batch');
-                // new batch
+            this.latestStateReceived.push(buffer);
+            if (buffer[buffer.length - 1] == 0xf7) {
+                // end message 
+                this.readStateMessage();
+                this.log('Receive last message in batch, processing message ' + this.latestStateReceived.length);
+                this.readStateMessage();
                 this.latestStateReceived = [];
             }
-            else {
-                // current batch
-                this.log('Receive: Adding to message batch');
-            }
-            this.latestStateReceived.push(buffer);
-            setTimeout(() => {
-                if (this.latestStateReceived.length > 0) {
-                    // process last message batch
-                    this.log('Receive: Processing message batch ' + this.latestStateReceived.length);
-                    this.readStateMessage();
-                    this.latestStateReceived = [];
-                }
-            }, 500);
         });
     }
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
-            /* var btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
-     
-             btSerial.on('found', function (address, name) {
-                 console.log("addr:" + address + " name:" + name)
-             
-                 if (name == "Spark 40 Audio") {
-                     console.log("Connecting to spark..");
-                     address = "F7:EB:ED:2F:75:BA";
-             
-                     btSerial.findSerialPortChannel(address, function (channel) {
-                         btSerial.connect(address, channel, function () {
-                             console.log('connected');
-             
-                             btSerial.write(Buffer.from('my data', 'utf-8'), function (err, bytesWritten) {
-                                 if (err) console.log(err);
-                             });
-             
-                             btSerial.on('data', function (buffer) {
-                                 console.log(buffer.toString('utf-8'));
-                             });
-                         }, function () {
-                             console.log('cannot connect');
-                         });
-             
-                         // close the connection when you're ready
-                         btSerial.close();
-                     }, function () {
-                         console.log('found nothing');
-                     });
-                 }
-             });
-             */
-            //btSerial.inquire();
             return new Promise((resolve, reject) => {
                 this.btSerial.connect(this.deviceAddress, 2, () => {
                     this.log('bluetooth device connected');
@@ -131,6 +88,12 @@ class SparkDeviceManager {
             }
             if (type == "set_fx_param") {
                 //msgArray = msg.change_effect_parameter(data);
+            }
+            if (type == "get_preset") {
+                msgArray = msg.request_preset_state();
+            }
+            if (type == "get_devicename") {
+                msgArray = msg.request_info(0x23);
             }
             for (let msg of msgArray) {
                 this.btSerial.write(Buffer.from(msg), (err, bytesWritten) => {

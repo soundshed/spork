@@ -29,7 +29,7 @@ let msg_rx = ["01fe000041ff6a000000000000000000f001046b0301200f00190000592400373
     "01fe000041ff6a0000000000000000003f090000002b62696100732e7265766572f7f00104070301300f0c19624317000b114a3e2d3027013b114a3e28193b023b114a3e60173203f7f00104240301180f0d19114a3f315b162004114a3e795b797a05114a3e6e594a38",
     "01fe000041ff2400000000000000000006114a3e19f7f00104640301180f0e03191a7df7"];
 let preset_rx = [];
-for (let h in msg_rx) {
+for (let h of msg_rx) {
     preset_rx.push(fromHexString(h));
 }
 reader.set_message(preset_rx);
@@ -44,7 +44,7 @@ let preset_m = [
     "01fe000053fe1a000000000000000000f001117f013800007ff",
 ];
 preset_rx = [];
-for (let h in msg_rx) {
+for (let h of msg_rx) {
     preset_rx.push(fromHexString(h));
 }
 reader.set_message(preset_rx);

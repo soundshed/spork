@@ -184,6 +184,28 @@ export class SparkCommandMessage {
 
     // Functions to package a command for the Spark
 
+    request_preset_state() {
+        const cmd = 0x02; // get
+        const sub_cmd = 0x01 // preset
+
+        this.start_message(cmd, sub_cmd)
+
+        this.add_bytes(bytes(1))
+
+        return this.end_message()
+    }
+
+    request_info(sub_cmd) {
+        const cmd = 0x02; // get
+    
+        this.start_message(cmd, sub_cmd)
+
+        this.add_bytes(bytes(0))
+
+        return this.end_message()
+    }
+
+
     change_effect_parameter(pedal, param, val) {
         const cmd = 0x01
         const sub_cmd = 0x04

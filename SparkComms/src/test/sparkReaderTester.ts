@@ -38,7 +38,7 @@ let msg_rx = ["01fe000041ff6a000000000000000000f001046b0301200f00190000592400373
     "01fe000041ff2400000000000000000006114a3e19f7f00104640301180f0e03191a7df7"]
 
 let preset_rx = []
-for (let h in msg_rx) {
+for (let h of msg_rx) {
     preset_rx.push(fromHexString(h))
 }
 
@@ -57,7 +57,7 @@ let preset_m = [
 ]
 
 preset_rx = []
-for (let h in msg_rx) {
+for (let h of msg_rx) {
     preset_rx.push(fromHexString(h))
 }
 

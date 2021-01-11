@@ -37,14 +37,19 @@ function len(val) {
         return enc.encode(val).byteLength;
     }
     else {
-        return val.length;
+        return val.byteLength;
     }
 }
 function buf2hex(buffer) {
     return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
 }
 function hex(val) {
-    return val + "";
+    try {
+        return buf2hex(val);
+    }
+    catch (_a) {
+        return val + "";
+    }
 }
 function chr(val) {
     return String.fromCharCode(val);
@@ -137,7 +142,7 @@ class SparkMessageReader {
             let this_cmd = chunk[0];
             let this_sub_cmd = chunk[1];
             let this_data = chunk[2];
-            if (this_cmd in [1, 3] && this_sub_cmd == 1) {
+            if ((this_cmd == 1 || this_cmd == 3) && this_sub_cmd == 1) {
                 //found a multi-message
                 let num_chunks = this_data[0];
                 let this_chunk = this_data[1];

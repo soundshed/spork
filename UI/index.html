@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,18 +9,21 @@
     <link href="./node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="./css/styles.css" rel="stylesheet">
 </head>
+
 <body>
-    <div class="container mx-auto">
+    <div class="container">
         <h1>Manager</h1>
         <p>
-            System: node <script>document.write(process.versions.node)</script>,
-            Chrome <script>document.write(process.versions.chrome)</script>,
-            and Electron <script>document.write(process.versions.electron)</script>.
+            System: node
+            <script>document.write(process.versions.node)</script>,
+            Chrome
+            <script>document.write(process.versions.chrome)</script>,
+            and Electron
+            <script>document.write(process.versions.electron)</script>.
         </p>
-    
+
         <button id="connect">Connect</button>
-
-
+        <button id="getPreset">Get Preset</button>
         <button id="applyPreset">Set Preset</button>
 
         <button id="ch1">1</button>
@@ -31,8 +35,8 @@
 
 
         <div id="state">---</div>
-      </div>
-    
+    </div>
+
 </body>
 
 

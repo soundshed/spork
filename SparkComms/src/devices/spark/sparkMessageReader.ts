@@ -41,7 +41,7 @@ function len(val): number {
     if (typeof (val) == 'string') {
         return enc.encode(val).byteLength;
     } else {
-        return val.length;
+        return val.byteLength;
     }
 }
 
@@ -50,7 +50,11 @@ function buf2hex(buffer) { // buffer is an ArrayBuffer
 }
 
 function hex(val): string {
-    return val + "";
+    try {
+        return buf2hex(val);
+    } catch {
+        return val + "";
+    }
 }
 
 function chr(val): string {
@@ -174,7 +178,7 @@ export class SparkMessageReader {
             let this_cmd = chunk[0]
             let this_sub_cmd = chunk[1]
             let this_data = chunk[2]
-            if (this_cmd in [1, 3] && this_sub_cmd == 1) {
+            if ((this_cmd == 1 || this_cmd == 3) && this_sub_cmd == 1) {
                 //found a multi-message
                 let num_chunks = this_data[0]
                 let this_chunk = this_data[1]
@@ -241,9 +245,9 @@ export class SparkMessageReader {
         let val = 0;
 
         let flt_bytes = this.msg
-                            .subarray(this.msg_pos, this.msg_pos + 4)
-                            .reverse()
-                            .slice(0);
+            .subarray(this.msg_pos, this.msg_pos + 4)
+            .reverse()
+            .slice(0);
 
         let floatArray = new Float32Array(flt_bytes.buffer);
 
@@ -378,7 +382,7 @@ export class SparkMessageReader {
         let name = this.read_string()
         this.add_str("Name", name)
         const version = this.read_string()
-        this.add_str("Verion", version)
+        this.add_str("Version", version)
         const descr = this.read_string()
         this.add_str("Description", descr)
 

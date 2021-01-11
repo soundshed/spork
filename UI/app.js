@@ -35,6 +35,11 @@ const setupUIActions = () => {
     ipcRenderer.invoke('perform-action', { action: 'applyPreset', data: presets[presetNumber] })
   });
 
+  
+  getElement("getPreset").addEventListener("click", () => {
+    ipcRenderer.invoke('perform-action', { action: 'getPreset', data: 0 })
+  });
+
   getElement("ch1").addEventListener("click", () => {
     ipcRenderer.invoke('perform-action', { action: 'setChannel', data: 0 })
   });
