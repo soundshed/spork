@@ -13,23 +13,20 @@
 <body>
     <div class="container">
         <h1>Manager</h1>
-        <p>
-            System: node
-            <script>document.write(process.versions.node)</script>,
-            Chrome
-            <script>document.write(process.versions.chrome)</script>,
-            and Electron
-            <script>document.write(process.versions.electron)</script>.
-        </p>
+       
 
-        <button id="connect">Connect</button>
-        <button id="getPreset">Get Preset</button>
-        <button id="applyPreset">Set Preset</button>
+        <button type="button" class="btn btn-secondary" id="connect">Connect</button>
+        <button type="button" class="btn btn-secondary" id="getPreset">Get Preset</button>
+        <button type="button" class="btn btn-secondary" id="applyPreset">Set Preset</button>
 
-        <button id="ch1">1</button>
-        <button id="ch2">2</button>
-        <button id="ch3">3</button>
-        <button id="ch4">4</button>
+
+
+        <div class="btn-group" role="group" aria-label="Channel Selection">
+            <button type="button" class="btn btn-secondary" id="ch1">1</button>
+            <button type="button" class="btn btn-secondary" id="ch2">2</button>
+            <button type="button" class="btn btn-secondary" id="ch3">3</button>
+            <button type="button" class="btn btn-secondary" id="ch4">4</button>
+        </div>
 
         <div id="status">Not connected</div>
 
@@ -38,35 +35,40 @@
 
         <div>
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
-        <label>Gain</label>
-    </div>
-    <div class="col-sm">
-        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
-        <label>Bass</label>
-    </div>
-    <div class="col-sm">
-        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
-        <label>Mid</label>
-    </div>
-    <div class="col-sm">
-        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
-        <label>Treble</label>
-    </div>
-  </div>
-</div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Gain</label>
+                    </div>
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Bass</label>
+                    </div>
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Mid</label>
+                    </div>
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Treble</label>
+                    </div>
+                </div>
+            </div>
 
-           
-    <webaudio-slider></webaudio-slider>
-    <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
-    <webaudio-param link="knob-1"></webaudio-param>
+
+            <label>
+                System: node
+                <script>document.write(process.versions.node)</script>,
+                Chrome
+                <script>document.write(process.versions.chrome)</script>,
+                and Electron
+                <script>document.write(process.versions.electron)</script>.
+            </label>
         </div>
     </div>
 
-    
+
 </body>
 
 <script src="./lib/webaudio-controls/webaudio-controls.js"></script>
