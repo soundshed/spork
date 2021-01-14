@@ -11,52 +11,165 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Manager</h1>
-       
-
-        <button type="button" class="btn btn-secondary" id="connect">Connect</button>
-        <button type="button" class="btn btn-secondary" id="getPreset">Get Preset</button>
-        <button type="button" class="btn btn-secondary" id="applyPreset">Set Preset</button>
+    <div class="container m-1">
 
 
-
-        <div class="btn-group" role="group" aria-label="Channel Selection">
-            <button type="button" class="btn btn-secondary" id="ch1">1</button>
-            <button type="button" class="btn btn-secondary" id="ch2">2</button>
-            <button type="button" class="btn btn-secondary" id="ch3">3</button>
-            <button type="button" class="btn btn-secondary" id="ch4">4</button>
-        </div>
-
-        <div id="status">Not connected</div>
-
-
-        <div id="state">---</div>
-
+<h6>Device Controls</h6>
         <div>
-
+            <h4 class="preset-name">Preset Name 05</h4>
             <div class="container">
-                <div class="row">
+
+                <div class="row control-strip">
                     <div class="col-sm">
-                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
                         <label>Gain</label>
                     </div>
                     <div class="col-sm">
-                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <webaudio-knob id="knob-bass" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
                         <label>Bass</label>
                     </div>
                     <div class="col-sm">
-                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <webaudio-knob id="knob-mid" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
                         <label>Mid</label>
                     </div>
                     <div class="col-sm">
-                        <webaudio-knob id="knob-1" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <webaudio-knob id="knob-treble" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
                         <label>Treble</label>
+                    </div>
+
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-master" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Master</label>
+                    </div>
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-mod" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Modulation</label>
+                    </div>
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-delay" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Delay</label>
+                    </div>
+                    <div class="col-sm">
+                        <webaudio-knob id="knob-reverb" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Reverb</label>
+                    </div>
+                </div>
+
+            </div>
+
+            <h6>Signal Chain</h6>
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-md-1">
+                        <div class="fx">
+                            <h4 class="preset-name">Noise Gate</h4>
+
+                            <webaudio-knob id="knob-threshold" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                            <label>Threshold</label>
+
+                            <webaudio-knob id="knob-threshold" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                            <label>Decay</label>
+
+
+                            <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="fx">
+                            <h4 class="preset-name">Comp</h4>
+
+                            <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                            <label>Gain</label>
+
+                            <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                            <label>Peak Reduction</label>
+
+
+                            <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+                        </div>
+                    </div>
+               
+                <div class="col-md-1">
+                    <div class="fx">
+                        <h4 class="preset-name">Drive</h4>
+
+                        <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Gain</label>
+
+
+                        <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="fx">
+                        <h4 class="preset-name">Amp</h4>
+
+                        <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Gain</label>
+
+
+                        <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="fx">
+                        <h4 class="preset-name">Mod</h4>
+
+                        <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Gain</label>
+
+
+                        <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="fx">
+                        <h4 class="preset-name">Delay</h4>
+
+                        <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Gain</label>
+
+
+                        <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="fx">
+                        <h4 class="preset-name">Reverb</h4>
+
+                        <webaudio-knob id="knob-gain" src="./lib/webaudio-controls/knobs/LittlePhatty.png" min="0" max="100"></webaudio-knob>
+                        <label>Gain</label>
+
+
+                        <webaudio-switch src="./lib/webaudio-controls/knobs/switch_toggle.png" width="32" height="32"></webaudio-switch>
                     </div>
                 </div>
             </div>
+        </div>
 
 
+
+        <div class="container m-3">
+            <button type="button" class="btn btn-secondary" id="connect">Connect <span id="connect-progress" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span></button>
+            <button type="button" class="btn btn-secondary" id="getPreset">Get Preset</button>
+            <button type="button" class="btn btn-secondary" id="applyPreset">Set Preset</button>
+
+
+
+            <div class="btn-group" role="group" aria-label="Channel Selection">
+                <button type="button" class="btn btn-secondary" id="ch1">1</button>
+                <button type="button" class="btn btn-secondary" id="ch2">2</button>
+                <button type="button" class="btn btn-secondary" id="ch3">3</button>
+                <button type="button" class="btn btn-secondary" id="ch4">4</button>
+            </div>
+
+            <div id="status">Not connected</div>
+
+
+            <div id="state">---</div>
+        </div>
+        <div class="m-3">
             <label>
                 System: node
                 <script>document.write(process.versions.node)</script>,
@@ -66,6 +179,7 @@
                 <script>document.write(process.versions.electron)</script>.
             </label>
         </div>
+    </div>
     </div>
 
 

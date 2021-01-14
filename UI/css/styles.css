@@ -1,13 +1,48 @@
+@font-face {
+    font-family: "digital";
+    src: url("./fonts/digital_7/Digital-7.woff2") format("woff2"),
+        url("./fonts/digital_7/Digital-7.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     background-color: rgb(39, 38, 38);
     color: whitesmoke;
 }
 h1 {
-    font-size:140%
+    font-size: 140%;
 }
 
-label{
+label {
     display: block;
-    font-size:0.6em;
-    margin-left:2em;
+    font-size: 0.6em;
+    margin-left: 2em;
+    color: darkkhaki;
+    font-weight: bold;
+}
+
+.preset-name {
+    font-family: "digital";
+    background-color: rgba(0, 0, 0, 0.473);
+    padding: 0.2em;
+    color: rgb(252, 235, 0);
+    text-shadow: 2px 2px 2px rgba(128, 128, 128, 0.644);
+    border-radius: 8px;
+}
+
+.control-strip {
+    background-color: rgba(0, 0, 0, 0.596);
+    padding: 1em;
+    border-radius: 8px;
+    border: 1px solid rgb(99, 72, 0);
+}
+
+.fx {
+    margin: 0.2em;
+    box-shadow: 3px 3px 8px gainsboro;
+}
+.fx .preset-name {
+    color: aliceblue;
 }
