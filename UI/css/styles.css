@@ -40,6 +40,7 @@ label {
 }
 
 .fx {
+    min-width:100px;
     margin: 0.2em;
     box-shadow: 3px 3px 8px gainsboro;
 }
