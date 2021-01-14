@@ -60,8 +60,10 @@ class SparkMessageReader {
         this.text = "";
         this.python = "";
         this.indent = "";
+        this.deviceState = {};
         this.data = [];
         this.message = [];
+        this.deviceState = {};
     }
     set_message(msgArray) {
         this.data = msgArray;
@@ -270,6 +272,7 @@ class SparkMessageReader {
         this.add_int("Parameter", param);
         this.add_float("Value", val);
         this.end_str();
+        this.deviceState.lastMessageReceived = { dspId: effect, value: val, index: param };
     }
     read_effect() {
         this.start_str();
@@ -278,6 +281,7 @@ class SparkMessageReader {
         this.add_str("OldEffect", effect1);
         this.add_str("NewEffect", effect2);
         this.end_str();
+        this.deviceState.lastMessageReceived = { dspIdOld: effect1, dspIdNew: effect2 };
     }
     read_hardware_preset() {
         this.start_str();
@@ -285,6 +289,8 @@ class SparkMessageReader {
         const preset_num = this.read_byte();
         this.add_int("NewPreset", preset_num);
         this.end_str();
+        this.deviceState.selectedPresetNumber = preset_num;
+        this.deviceState.lastMessageReceived = { presetNumber: preset_num };
     }
     read_store_hardware_preset() {
         this.start_str();
@@ -292,6 +298,8 @@ class SparkMessageReader {
         const preset_num = this.read_byte();
         this.add_int("NewStoredPreset", preset_num);
         this.end_str();
+        this.deviceState.selectedPresetNumber = preset_num;
+        this.deviceState.lastMessageReceived = { presetNumber: preset_num };
     }
     read_effect_onoff() {
         this.start_str();
@@ -300,27 +308,39 @@ class SparkMessageReader {
         this.add_str("Effect", effect);
         this.add_str("OnOff", onoff);
         this.end_str();
+        this.deviceState.lastMessageReceived = { dspId: effect, active: onoff == "On" };
     }
     read_preset() {
+        let deviceState = {};
+        let preset = {};
         this.start_str();
         this.read_byte();
-        const preset = this.read_byte();
+        const presetNum = this.read_byte();
+        deviceState.selectedPresetNumber = presetNum;
         this.add_int("Preset number", preset);
         const uuid = this.read_string();
         this.add_str("UUID", uuid);
         let name = this.read_string();
         this.add_str("Name", name);
         const version = this.read_string();
-        this.add_str("Verion", version);
+        this.add_str("Version", version);
         const descr = this.read_string();
         this.add_str("Description", descr);
         const icon = this.read_string();
         this.add_str("Icon", icon);
         const bpm = this.read_float();
         this.add_float("BPM", bpm);
+        preset.meta = {
+            id: uuid,
+            name: name,
+            version: version,
+            description: descr,
+            icon: icon
+        };
         const num_effects = this.read_byte() - 0x90;
         this.add_python("\"Effects\": [");
         this.add_indent();
+        let signalPaths = new Array();
         for (let i = 0; i < 7; i++) {
             const e_str = this.read_string();
             const e_onoff = this.read_onoff();
@@ -330,6 +350,7 @@ class SparkMessageReader {
             const num_p = this.read_byte() - 0x90;
             this.add_python("\"Parameters\":[");
             this.add_indent();
+            let fxParams = new Array();
             for (let p = 0; p < num_p; p++) {
                 const num = this.read_byte();
                 const spec = this.read_byte();
@@ -337,16 +358,27 @@ class SparkMessageReader {
                 this.add_int("Parameter", num, "python");
                 this.add_str("Special", hex(spec), "python");
                 this.add_float("Value", val, "python");
+                fxParams.push({ value: val, index: num });
             }
             this.add_python("],");
             this.del_indent();
             this.add_python("},");
+            let signalPath = {
+                active: (e_onoff == "On"),
+                params: fxParams,
+                dspId: e_str,
+                type: "speaker_fx"
+            };
+            signalPaths.push(signalPath);
         }
         this.add_python("],");
         this.del_indent();
         const unk = this.read_byte();
         this.add_str("Unknown", hex(unk));
         this.end_str();
+        preset.sigpath = signalPaths;
+        preset.type = "jamup_speaker";
+        this.deviceState.presetConfig = preset;
     }
     //
     set_interpreter(msg) {

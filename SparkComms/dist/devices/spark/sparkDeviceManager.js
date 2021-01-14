@@ -15,6 +15,7 @@ class SparkDeviceManager {
         this.latestStateReceived = [];
         this.lastStateTime = new Date().getTime();
         this.deviceAddress = "";
+        this.reader = new sparkMessageReader_1.SparkMessageReader();
         this.deviceAddress = deviceAddress;
         this.btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
         this.btSerial.on('data', (buffer) => {
@@ -26,6 +27,7 @@ class SparkDeviceManager {
                 // end message 
                 this.readStateMessage();
                 this.log('Receive last message in batch, processing message ' + this.latestStateReceived.length);
+                this.log(JSON.stringify(this.reader.deviceState));
                 this.readStateMessage();
                 this.latestStateReceived = [];
             }
@@ -57,7 +59,7 @@ class SparkDeviceManager {
     readStateMessage() {
         return __awaiter(this, void 0, void 0, function* () {
             this.log("Reading state message:" + this.buf2hex(this.latestStateReceived));
-            let reader = new sparkMessageReader_1.SparkMessageReader();
+            let reader = this.reader;
             reader.set_message(this.latestStateReceived);
             let b = reader.read_message();
             this.log(reader.text);
@@ -102,7 +104,6 @@ class SparkDeviceManager {
                 });
                 yield this.sleep(100);
             }
-            //thisbtSerial.close();
         });
     }
     log(msg) {

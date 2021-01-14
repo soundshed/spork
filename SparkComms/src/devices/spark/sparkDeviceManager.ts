@@ -1,4 +1,5 @@
 import { DeviceController } from "../../interfaces/deviceController";
+import { FxCatalogItem } from "../../interfaces/preset";
 import { SparkCommandMessage } from "./sparkCommandMessage";
 import { SparkMessageReader } from "./sparkMessageReader";
 
@@ -12,6 +13,8 @@ export class SparkDeviceManager implements DeviceController {
     private lastStateTime = new Date().getTime()
 
     public deviceAddress = "";
+
+    private reader = new SparkMessageReader();
 
     constructor(deviceAddress) {
         this.deviceAddress = deviceAddress
@@ -31,10 +34,13 @@ export class SparkDeviceManager implements DeviceController {
                 this.readStateMessage();
 
                 this.log('Receive last message in batch, processing message ' + this.latestStateReceived.length);
+
+                this.log(JSON.stringify(this.reader.deviceState))
+
                 this.readStateMessage();
                 this.latestStateReceived = [];
             }
-            
+
         });
     }
 
@@ -69,7 +75,9 @@ export class SparkDeviceManager implements DeviceController {
 
         this.log("Reading state message:" + this.buf2hex(this.latestStateReceived));
 
-        let reader = new SparkMessageReader();
+
+        let reader = this.reader;
+
         reader.set_message(this.latestStateReceived);
 
 
@@ -131,4 +139,23 @@ export class SparkDeviceManager implements DeviceController {
     private log(msg) {
         console.log(msg);
     }
+
+    public getFxCatalog() {
+
+        let fxCatalog: Array<FxCatalogItem> = [
+            {
+                type: "speaker_fx", dspId: "BBEOpticalComp", name: "Optical Comp", params: [
+                    { index: 0, value: 0.6, name: "Volume (-/+ 6dB)" },
+                    { index: 1, value: 0.4, name: "Comp" },
+                    { index: 1, value: false, name: "Pad (0dB/15dB)_" }
+                ]
+            }
+
+        ];
+
+
+
+        return fxCatalog;
+    }
+
 }
