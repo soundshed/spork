@@ -1,7 +1,7 @@
 @font-face {
     font-family: "digital";
-    src: url("./fonts/digital_7/Digital-7.woff2") format("woff2"),
-        url("./fonts/digital_7/Digital-7.woff") format("woff");
+    src: url("fonts/digital_7/Digital-7.woff2") format("woff2"),
+        url("fonts/digital_7/Digital-7.woff") format("woff");
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -36,13 +36,14 @@ label {
     background-color: rgba(0, 0, 0, 0.596);
     padding: 1em;
     border-radius: 8px;
-    border: 1px solid rgb(99, 72, 0);
+    border: 1px solid rgb(99, 72, 0); 
 }
 
 .fx {
     min-width:100px;
-    margin: 0.2em;
-    box-shadow: 3px 3px 8px gainsboro;
+
+    box-shadow: -1px 1px 9px 0px #020202cf;
+    margin: auto;
 }
 .fx .preset-name {
     color: aliceblue;

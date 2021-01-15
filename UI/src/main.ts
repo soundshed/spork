@@ -1,20 +1,20 @@
 //import { SparkManager } from './lib/spork/sparkManager';
-const { app, BrowserWindow, ipcMain, ipcRenderer } = require("electron");
-const { SparkDeviceManager } = require("./lib/spork/devices/spark/sparkDeviceManager.js")
+import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron';
+import { SparkDeviceManager } from './spork/src/devices/spark/sparkDeviceManager';
+
 
 try {
     require('electron-reloader')(module)
 } catch (_) { }
 
 
-let win = null;
+let win: BrowserWindow;
 
-
-const sendMessage = (type, msg) => {
+const sendMessage = (type: string, msg: string) => {
     if (win) {
         win.webContents.send(type, msg);
     }
-}
+} 
 
 function createWindow() {
     win = new BrowserWindow({
@@ -25,7 +25,7 @@ function createWindow() {
         }
     })
 
-    win.loadFile('index.html')
+    win.loadFile('../index.html')
 }
 
 const deviceManager = new SparkDeviceManager("08:EB:ED:8F:84:0B");
@@ -36,7 +36,7 @@ ipcMain.handle('perform-action', (event, args) => {
 
     if (args.action == 'connect') {
 
-        deviceManager.onStateChanged = (s) => {
+        deviceManager.onStateChanged = (s: any) => {
             onDeviceStateChanged(s)
         };
 
@@ -72,7 +72,7 @@ ipcMain.handle('perform-action', (event, args) => {
     }
 })
 
-function onDeviceStateChanged(stateInfo) {
+function onDeviceStateChanged(stateInfo: any) {
     sendMessage('device-state-changed', stateInfo);
 }
 
