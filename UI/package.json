@@ -2,9 +2,10 @@
   "name": "spork-ui",
   "version": "1.0.0",
   "description": "",
-  "main": "./build/main.js",
+  "main": "./build/main.bundle.js",
   "scripts": {
-    "build": "webpack --config ./webpack.config.js",
+    "build": "npx tsc && webpack --config ./webpack.config.js",
+    "watch": "webpack -w --config ./webpack.config.js",
     "start": "npm run build && electron ./build/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pack": "electron-builder --dir",

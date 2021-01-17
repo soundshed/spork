@@ -2,7 +2,8 @@
   "compilerOptions": {
       "target": "es6",         
       "module": "commonjs",    
-      "strict": true,          
+      "strict": true,         
+      "sourceMap": true, 
       "esModuleInterop": true,    
       "outDir": "./build",
       "noImplicitAny": false,

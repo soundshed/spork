@@ -1,5 +1,5 @@
 import { DeviceController } from "../../interfaces/deviceController";
-import { FxCatalogItem } from "../../interfaces/preset";
+import { DeviceState, FxCatalogItem } from "../../interfaces/preset";
 import { SparkCommandMessage } from "./sparkCommandMessage";
 import { SparkMessageReader } from "./sparkMessageReader";
 
@@ -15,6 +15,8 @@ export class SparkDeviceManager implements DeviceController {
     public deviceAddress = "";
 
     private reader = new SparkMessageReader();
+
+
 
     constructor(deviceAddress) {
         this.deviceAddress = deviceAddress
@@ -37,7 +39,6 @@ export class SparkDeviceManager implements DeviceController {
 
                 this.log(JSON.stringify(this.reader.deviceState))
 
-                this.readStateMessage();
                 this.latestStateReceived = [];
             }
 
@@ -83,12 +84,46 @@ export class SparkDeviceManager implements DeviceController {
 
         let b = reader.read_message();
 
-        this.log(reader.text);
-
         this.stateInfo = reader.text;
 
+        this.hydrateDeviceStateInfo(reader.deviceState);
+
         if (this.onStateChanged) {
-            this.onStateChanged(this.stateInfo);
+            this.onStateChanged(reader.deviceState);
+        } else {
+            this.log("No onStateChange handler defined.")
+        }
+    }
+
+    private hydrateDeviceStateInfo(deviceState: DeviceState) {
+        let fxCatalog = this.getFxCatalog();
+
+        // populate metadata about fx etc
+        if (deviceState.presetConfig) {
+            for (let fx of deviceState.presetConfig.sigpath) {
+                let dsp = fxCatalog.find(f => f.dspId == fx.dspId);
+                if (dsp != null) {
+                    fx.type = dsp.type;
+                    fx.name = dsp.name;
+                    fx.description = dsp.description;
+
+                    for (let p of fx.params) {
+                        let paramInfo = dsp.params.find(pa => pa.index == p.index);
+                        if (paramInfo) {
+                            p.name = paramInfo.name;
+                        }
+                    }
+                } else {
+                    fx.name = fx.dspId;
+                    fx.description = "(No description)";
+
+                    for (let p of fx.params) {
+                        if (p != null) {
+                            p.name = "Param " + p.index.toString();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -109,12 +144,15 @@ export class SparkDeviceManager implements DeviceController {
         if (type == "set_preset") {
             msgArray = msg.create_preset(data);
         }
+
         if (type == "set_channel") {
             msgArray = msg.change_hardware_preset(data);
         }
+
         if (type == "set_fx") {
             //msgArray = msg.change_effect(data);
         }
+
         if (type == "set_fx_param") {
             //msgArray = msg.change_effect_parameter(data);
         }
@@ -137,16 +175,26 @@ export class SparkDeviceManager implements DeviceController {
     }
 
     private log(msg) {
-        console.log(msg);
+        console.log("[Spark Device Manager] : " + msg);
     }
 
     public getFxCatalog() {
 
         let fxCatalog: Array<FxCatalogItem> = [
+            // noise gate
+            {
+
+                type: "gate", dspId: "bias.noisegate", name: "Noise Gate", params: [
+                    { index: 0, value: 0.2, name: "Threshold" },
+                    { index: 1, value: 0.05, name: "Decay" },
+                    { index: 2, value: 1, name: "On/Off", type: "switch" },
+
+                ]
+            },
             // amps
             {
 
-                type: "speaker_fx", dspId: "94MatchDCV2", name: "94MatchDCV2 Comp", params: [
+                type: "amp", dspId: "94MatchDCV2", name: "94MatchDCV2 Comp", params: [
                     { index: 0, value: 0.5, name: "Gain" },
                     { index: 1, value: 0.3, name: "Bass" },
                     { index: 2, value: 0.4, name: "Middle" },
@@ -158,12 +206,35 @@ export class SparkDeviceManager implements DeviceController {
             // comp
             {
 
-                type: "speaker_fx", dspId: "BBEOpticalComp", name: "Optical Comp", params: [
+                type: "comp", dspId: "BBEOpticalComp", name: "Optical Comp", params: [
                     { index: 0, value: 0.6, name: "Volume (-/+ 6dB)" },
                     { index: 1, value: 0.4, name: "Comp" },
                     { index: 2, value: false, name: "Pad (0dB/15dB)_" }
                 ]
+            },
+            // drive
+            {
+
+                type: "drive", dspId: "DistortionTS9", name: "Tube Drive", params: [
+                    { index: 0, value: 0.5, name: "Overdrive" },
+                    { index: 1, value: 0.5, name: "Tone" },
+                    { index: 2, value: 0.6, name: "Level" }
+                ]
+            },
+            //reverb
+
+            {
+
+                type: "reverb", dspId: "bias.reverb", name: "Ambient", params: [
+                    { name: "Level", index: 0, value: 0.8 },
+                    { name: "Damping", index: 1, value: 0.2 },
+                    { name: "Low Cut", index: 2, value: 0.8 },
+                    { name: "High Cut", index: 3, value: 0.7 },
+                    { name: "Dwell", index: 4, value: 0.3 },
+                    { name: "Time", index: 5, value: 0.5 }
+                ]
             }
+
 
         ];
 

@@ -21,11 +21,12 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false
         }
     })
 
-    win.loadFile('../index.html')
+    win.loadFile('index.html');
 }
 
 const deviceManager = new SparkDeviceManager("08:EB:ED:8F:84:0B");
@@ -37,6 +38,7 @@ ipcMain.handle('perform-action', (event, args) => {
     if (args.action == 'connect') {
 
         deviceManager.onStateChanged = (s: any) => {
+            console.log("main.ts: device state changed: "+JSON.stringify(s))
             onDeviceStateChanged(s)
         };
 
@@ -72,8 +74,8 @@ ipcMain.handle('perform-action', (event, args) => {
     }
 })
 
-function onDeviceStateChanged(stateInfo: any) {
-    sendMessage('device-state-changed', stateInfo);
+function onDeviceStateChanged(deviceState: any) {
+    sendMessage('device-state-changed', deviceState);
 }
 
 ////////////////////////

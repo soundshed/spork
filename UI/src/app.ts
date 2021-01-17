@@ -58,6 +58,8 @@ ipcRenderer.on('device-state-changed', (event, args) => {
   setElementText('state', JSON.stringify(args));
 });
 */
+
+/*
 ipcRenderer.on('device-connection-changed', (event, args) => {
 
   log("got connection event from main:" + args);
@@ -71,7 +73,7 @@ ipcRenderer.on('device-connection-changed', (event, args) => {
   if (args == "failed") {
     uiState.connected = false;
   }
-});
+});*/
 
 function setElementText(id: string, msg: string) {
   const el = getElement(id);

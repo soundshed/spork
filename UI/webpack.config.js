@@ -8,10 +8,12 @@ module.exports = {
 	target: 'electron-renderer',
 	mode: 'development',
 	devtool: 'inline-source-map',
-	entry: `./src/components/start.tsx`,
+	entry: {
+		app: './src/components/app.tsx',	
+	},
 	output: {
 		path: path.resolve(__dirname, 'build'),
-		filename: 'bundle.js'
+		filename: '[name].bundle.js'
 	},
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
@@ -24,26 +26,26 @@ module.exports = {
 			{
 				test: /\.css$/i,
 				use: ['style-loader', 'css-loader'],
-			  },
-			  {
+			},
+			{
 				test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
 				use: [
-				  {
-					loader: 'file-loader'
-				  }
+					{
+						loader: 'file-loader'
+					}
 				]
-			  }
+			}
 		]
 	},
 	plugins: [
 		new HtmlWebpackPlugin({
-		  template: './index.html'
+			template: './index.html'
 		}),
 		new CopyPlugin({
 			patterns: [
-			  { from: './css', to: 'css' },
-			  { from: './lib', to: 'lib' }
+				{ from: './css', to: 'css' },
+				{ from: './lib', to: 'lib' }
 			]
 		})
-	  ]
+	]
 };
