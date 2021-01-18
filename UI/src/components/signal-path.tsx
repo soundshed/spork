@@ -15,8 +15,6 @@ const SignalPathControl = ({ signalPathState }) => {
   const listItems = signalPathState.sigpath.map((fx) => (
     <div key={fx.dspId.toString()} className="col-md-2">
       <FxControl fx={fx}></FxControl>
-
-    
     </div>
   ));
 

@@ -1,4 +1,5 @@
 import * as React from "react";
+import FxParam from "./fx-param";
 
 declare global {
   namespace JSX {
@@ -11,15 +12,7 @@ declare global {
 
 const FxControl = ({ fx }) => {
   const paramControls = fx.params.map((p) => (
-    <div key={p.index.toString()}>
-      <webaudio-knob
-        src="./lib/webaudio-controls/knobs/LittlePhatty.png"
-        min="0"
-        value={p.value}
-        max="1"
-      ></webaudio-knob>
-      <label>{p.name}</label>
-    </div>
+    <FxParam key={p.index.toString()} p={p} fx={fx}></FxParam>
   ));
 
   return (
@@ -31,15 +24,14 @@ const FxControl = ({ fx }) => {
 
         <webaudio-switch
           src="./lib/webaudio-controls/knobs/switch_toggle.png"
-         
           value={fx.active == true ? "1" : "0"}
+          onChange={(e) => console.log(`change, value: ${e.target.value}`)}
+          onInput={(e) => console.log(`input, value: ${e.currentTarget.value}`)}
         ></webaudio-switch>
 
         {fx.active ? <label>On</label> : <label>Off</label>}
-
-       
       </div>
-      
+      {/*<pre>{JSON.stringify(fx)}</pre>*/}
     </div>
   );
 };

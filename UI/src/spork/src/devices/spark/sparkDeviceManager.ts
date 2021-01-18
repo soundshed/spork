@@ -1,6 +1,7 @@
 import { DeviceController } from "../../interfaces/deviceController";
 import { DeviceState, FxCatalogItem } from "../../interfaces/preset";
 import { SparkCommandMessage } from "./sparkCommandMessage";
+import { FxCatalogProvider } from "./sparkFxCatalog";
 import { SparkMessageReader } from "./sparkMessageReader";
 
 export class SparkDeviceManager implements DeviceController {
@@ -96,12 +97,12 @@ export class SparkDeviceManager implements DeviceController {
     }
 
     private hydrateDeviceStateInfo(deviceState: DeviceState) {
-        let fxCatalog = this.getFxCatalog();
+        let fxCatalog = FxCatalogProvider.db;
 
         // populate metadata about fx etc
         if (deviceState.presetConfig) {
             for (let fx of deviceState.presetConfig.sigpath) {
-                let dsp = fxCatalog.find(f => f.dspId == fx.dspId);
+                let dsp = fxCatalog.catalog.find(f => f.dspId == fx.dspId);
                 if (dsp != null) {
                     fx.type = dsp.type;
                     fx.name = dsp.name;
@@ -179,6 +180,7 @@ export class SparkDeviceManager implements DeviceController {
     }
 
     public getFxCatalog() {
+
 
         let fxCatalog: Array<FxCatalogItem> = [
             // noise gate

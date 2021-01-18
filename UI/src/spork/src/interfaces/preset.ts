@@ -59,3 +59,14 @@ export interface FxCatalogItem {
     description?: string;
     params: Array<FxParam>;
 }
+
+export interface FXCatalogItemType {
+    id: string;
+    name: string;
+    index: number;
+    description: string;
+}
+export interface FxCatalog {
+    types: Array<FXCatalogItemType>;
+    catalog: Array<FxCatalogItem>;
+}
