@@ -9,22 +9,29 @@ declare global {
   }
 }
 
-const SignalPathControl = ({ signalPathState }) => {
+const SignalPathControl = ({
+  signalPathState,
+  onFxParamChange,
+  onFxToggle,
+}) => {
   if (signalPathState.sigpath == null) signalPathState.sigpath = [];
 
   const listItems = signalPathState.sigpath.map((fx) => (
     <div key={fx.dspId.toString()} className="col-md-2">
-      <FxControl fx={fx}></FxControl>
+      <FxControl
+        fx={fx}
+        onFxParamChange={onFxParamChange}
+        onFxToggle={onFxToggle}
+      ></FxControl>
     </div>
   ));
 
   return (
     <div>
-      <h6>Signal Chain</h6>
-
-      <h4 className="preset-name">{signalPathState.meta?.name}</h4>
-
       <div className="container">
+        <h6>Signal Chain</h6>
+
+        <h4 className="preset-name">{signalPathState.meta?.name}</h4>
         <div className="row">{listItems}</div>
       </div>
     </div>

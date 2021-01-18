@@ -11,19 +11,25 @@ import "../../css/styles.css";
 import AppViewModel from "../core/appViewModel";
 import { useEffect } from "react";
 
-const App = () => {
-  let viewModel: AppViewModel;
+let viewModel: AppViewModel = new AppViewModel();
 
+const App = () => {
   const onViewModelStateChange = () => {
     setCurrentPreset(viewModel.preset);
     setConnected(viewModel.isConnected);
   };
 
   useEffect(() => {
-    if (!viewModel) {
-      viewModel = new AppViewModel(onViewModelStateChange);
-      console.log("loaded!");
+    if (viewModel) {
+      viewModel.addStateChangeListener(onViewModelStateChange);
+      console.log("view model attached");
     }
+
+    return () => {
+      viewModel.removeStateChangeListener();
+
+      console.log("view model removed");
+    };
   });
 
   // connection state
@@ -32,12 +38,27 @@ const App = () => {
   const [connected, setConnected] = React.useState(false);
   const [currentPreset, setCurrentPreset] = React.useState({});
 
+  const scanForDevices = () => {
+    setConnectionInProgress(true);
+
+    viewModel.scanForDevices().then((ok) => {
+     
+      setConnectionInProgress(false);
+
+    });
+  };
+
+
   const connectDevice = () => {
     setConnectionInProgress(true);
 
     viewModel.connectDevice().then((ok) => {
       setConnected(true);
       setConnectionInProgress(false);
+
+      setTimeout(() => {
+        requestCurrentPreset();
+      }, 1000);
     });
   };
 
@@ -52,17 +73,24 @@ const App = () => {
         );
 
         setCurrentPreset(viewModel.preset);
-      }, 1500);
+      }, 500);
     });
   };
 
-  const setChannel = (channelNum:number) => {
+  const setChannel = (channelNum: number) => {
     setConnectionInProgress(true);
 
     viewModel.setChannel(channelNum).then((ok) => {
       setConnectionInProgress(false);
-     
     });
+  };
+
+  const fxParamChange = (args) => {
+    viewModel.requestFxParamChange(args).then(() => {});
+  };
+
+  const fxToggle = (args) => {
+    viewModel.requestFxToggle(args).then(() => {});
   };
 
   // configure which state changes should cause component updates
@@ -79,6 +107,11 @@ const App = () => {
     currentPreset,
   ]);
 
+  useEffect(() => {
+    console.log("Startup, connecting..");
+   // connectDevice();
+  }, []);
+
   const [presetConfig, setPresetConfig] = React.useState({});
 
   return (
@@ -90,20 +123,23 @@ const App = () => {
       </Row>
       <Row>
         <Col>
-          <SignalPathControl
-            signalPathState={currentPreset}
-          ></SignalPathControl>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
           <MiscControls
+            onScanForDevices={scanForDevices}
             connected={connected}
             onConnect={connectDevice}
             connectionInProgress={connectionInProgress}
             requestCurrentPreset={requestCurrentPreset}
             setChannel={setChannel}
           ></MiscControls>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <SignalPathControl
+            signalPathState={currentPreset}
+            onFxParamChange={fxParamChange}
+            onFxToggle={fxToggle}
+          ></SignalPathControl>
         </Col>
       </Row>
     </Container>

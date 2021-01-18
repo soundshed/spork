@@ -11,9 +11,10 @@ declare global {
 const DeviceControls = () => {
   return (
     <div>
-      <h6>Device Controls</h6>
+     
       <div>
         <div className="container">
+        <h6>Device Controls</h6>
           <div className="row control-strip">
             <div className="col-sm">
               <webaudio-knob
@@ -22,7 +23,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Gain</label>
+              <label className="control-label">Gain</label>
             </div>
             <div className="col-sm">
               <webaudio-knob
@@ -31,7 +32,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Bass</label>
+              <label className="control-label">Bass</label>
             </div>
             <div className="col-sm">
               <webaudio-knob
@@ -40,7 +41,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Mid</label>
+              <label className="control-label">Mid</label>
             </div>
             <div className="col-sm">
               <webaudio-knob
@@ -49,7 +50,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Treble</label>
+              <label className="control-label">Treble</label>
             </div>
 
             <div className="col-sm">
@@ -59,7 +60,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Master</label>
+              <label className="control-label">Master</label>
             </div>
             <div className="col-sm">
               <webaudio-knob
@@ -68,7 +69,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Modulation</label>
+              <label className="control-label">Modulation</label>
             </div>
             <div className="col-sm">
               <webaudio-knob
@@ -77,7 +78,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100" 
               ></webaudio-knob>
-              <label>Delay</label>
+              <label className="control-label">Delay</label>
             </div>
             <div className="col-sm">
               <webaudio-knob
@@ -86,7 +87,7 @@ const DeviceControls = () => {
                 min="0"
                 max="100"
               ></webaudio-knob>
-              <label>Reverb</label>
+              <label className="control-label">Reverb</label>
             </div>
           </div>
         </div>

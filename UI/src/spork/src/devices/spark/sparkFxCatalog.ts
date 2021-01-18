@@ -203,7 +203,7 @@ export class FxCatalogProvider {
          },
          {
           "type": "amp",
-          "dspId": "AC.Boost",
+          "dspId": "AC Boost",
           "name": "AC Boost",
           "params": [
            {

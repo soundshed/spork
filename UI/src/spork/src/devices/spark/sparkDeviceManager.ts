@@ -38,11 +38,36 @@ export class SparkDeviceManager implements DeviceController {
 
                 this.log('Receive last message in batch, processing message ' + this.latestStateReceived.length);
 
-                this.log(JSON.stringify(this.reader.deviceState))
+                //this.log(JSON.stringify(this.reader.deviceState))
 
                 this.latestStateReceived = [];
             }
 
+        });
+    }
+
+    public async scanForDevices()  {
+       
+        let devices=[];
+        return new Promise((resolve,reject)=>{
+
+            this.btSerial.inquire();
+
+            this.btSerial.on('found',  (address, name)=> {
+                this.log("addr:" + address + " name:" + name)
+            
+                if (name == "Spark 40 Audio") {
+            
+                    btSerial.findSerialPortChannel(address,  (channel) =>{
+                        devices.push({name:name,address:address,port:channel});
+                    });
+                }
+            });
+            
+            setTimeout(()=>
+                resolve(devices)
+            ,3000);
+           
         });
     }
 
@@ -57,6 +82,13 @@ export class SparkDeviceManager implements DeviceController {
 
             }, () => {
                 this.log('cannot connect');
+
+                if (this.onStateChanged) {
+                    this.onStateChanged({ type: "connection", status: "failed" });
+                } else {
+                    this.log("No onStateChange handler defined.")
+                }
+
                 reject(false);
             });
 
@@ -75,7 +107,7 @@ export class SparkDeviceManager implements DeviceController {
 
     public async readStateMessage() {
 
-        this.log("Reading state message:" + this.buf2hex(this.latestStateReceived));
+        this.log("Reading state message" ); //+ this.buf2hex(this.latestStateReceived));
 
 
         let reader = this.reader;
@@ -150,12 +182,15 @@ export class SparkDeviceManager implements DeviceController {
             msgArray = msg.change_hardware_preset(data);
         }
 
-        if (type == "set_fx") {
-            //msgArray = msg.change_effect(data);
+        if (type == "set_fx_onoff") {
+            this.log("Toggling Effect " + JSON.stringify(data));
+            msgArray = msg.turn_effect_onoff(data.dspId, data.value == 1 ? "On" : "Off");
+
         }
 
         if (type == "set_fx_param") {
-            //msgArray = msg.change_effect_parameter(data);
+            this.log("Changing Effect Param " + JSON.stringify(data));
+            msgArray = msg.change_effect_parameter(data.dspId, data.index, data.value);
         }
 
         if (type == "get_preset") {

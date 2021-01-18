@@ -14,13 +14,7 @@ h1 {
     font-size: 140%;
 }
 
-label {
-    display: block;
-    font-size: 0.6em;
-    margin-left: 2em;
-    color: darkkhaki;
-    font-weight: bold;
-}
+
 
 .preset-name {
     font-family: "digital";
@@ -51,6 +45,25 @@ label {
     margin-left: 30%;
 }
 
+.fx label, .control-label{
+    
+        display: block;
+        font-size: 0.6em;
+        margin-left: 2em;
+        color: darkkhaki;
+        font-weight: bold;
+    
+}
+
 .container{
     margin-left:0;
+}
+label.fx-type  {
+    display: block;
+    font-size: 0.6em;
+    margin-left: 2em;
+    color: darkkhaki;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding:1em;
 }
