@@ -60,6 +60,7 @@ const MiscControls = ({
           </button>
         </div>
         <div className="col-md-2">
+          Channel :   
           <div
             className="btn-group"
             role="group"
