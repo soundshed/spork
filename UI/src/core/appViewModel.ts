@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import { BluetoothDeviceInfo } from '../spork/src/interfaces/deviceController';
 import { Preset } from '../spork/src/interfaces/preset';
 
 const debounce = (func, delay) => {
@@ -9,14 +10,17 @@ const debounce = (func, delay) => {
         timerId = setTimeout(boundFunc, delay);
     }
 }
-
 export class AppViewModel {
 
     public isConnected: boolean = false;
     public preset: Preset = {};
     public selectedChannel: number = 1;
+    public devices: BluetoothDeviceInfo[];
+
     public messages = [];
     public statusMessage = "";
+
+    // attached handler to be called by app model state changes and UI may have to react
     private onStateChangeHandler;
 
     private debouncedFXUpdate;
@@ -34,14 +38,12 @@ export class AppViewModel {
     }
 
     setupElectronIPCListeners() {
-        // setup event listeners for main electron app events (native bluetooth data state etc)
+        // setup event listeners for main electron app events (native bluetooth data state, device state responses, device list etc)
         ipcRenderer.on('device-state-changed', (event, args) => {
             this.log("got device state update from main.");
 
             if (args.presetConfig) {
                 this.preset = args.presetConfig;
-
-
             }
 
             if (args.lastMessageReceived) {
@@ -65,6 +67,15 @@ export class AppViewModel {
 
             this.onStateChangeHandler();
         });
+
+        ipcRenderer.on('devices-discovered', (event, args) => {
+
+            this.log("got refreshed list of devices:" + args);
+
+            this.devices = args;
+
+            this.onStateChangeHandler();
+        });
     }
 
     log(msg: string) {
@@ -76,9 +87,8 @@ export class AppViewModel {
         return true;
     }
 
-
-    async connectDevice(): Promise<boolean> {
-        await ipcRenderer.invoke('perform-action', { action: 'connect' });
+    async connectDevice(device: BluetoothDeviceInfo): Promise<boolean> {
+        await ipcRenderer.invoke('perform-action', { action: 'connect', data: device });
         return true;
     }
 
@@ -89,7 +99,6 @@ export class AppViewModel {
             });
         return true;
     }
-
 
     async requestFxParamChangeImmediate(args) {
         return ipcRenderer.invoke('perform-action', { action: 'setFxParam', data: args }).then(
@@ -110,7 +119,6 @@ export class AppViewModel {
         return true;
     }
 
-
     async requestFxToggle(args): Promise<boolean> {
         await ipcRenderer.invoke('perform-action', { action: 'setFxToggle', data: args }).then(
             () => {
@@ -118,6 +126,7 @@ export class AppViewModel {
             });
         return true;
     }
+
     async setChannel(channelNum: number): Promise<boolean> {
         await ipcRenderer.invoke('perform-action', { action: 'setChannel', data: channelNum }).then(
             () => {

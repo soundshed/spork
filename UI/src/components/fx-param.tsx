@@ -29,12 +29,12 @@ const FxParam = ({ type = "knob", p, fx, onFxParamChange }) => {
   };
 
   React.useEffect(() => {
-    customElement?.addEventListener("input", setParamValue);
+    //customElement?.addEventListener("input", setParamValue);
     customElement?.addEventListener("change", setParamValue);
 
     return () => {
-      customElement?.removeEventListener("input", setParamValue);
-      customElement?.removeEventListener("change", setParamValue);
+     // customElement?.removeEventListener("input", setParamValue);
+     customElement?.removeEventListener("change", setParamValue);
     };
   }, [setParamValue]);
 

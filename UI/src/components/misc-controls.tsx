@@ -1,12 +1,14 @@
 import * as React from "react";
 
 const MiscControls = ({
+  deviceScanInProgress,
   connected,
   onConnect,
   connectionInProgress,
   requestCurrentPreset,
   setChannel,
   onScanForDevices,
+  devices
 }) => {
   return (
     <div className="container ">
@@ -17,6 +19,16 @@ const MiscControls = ({
             className="btn btn-sm btn-primary"
             onClick={onScanForDevices}
           >Scan</button>
+
+{deviceScanInProgress ? (
+                  <span
+                   
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                ) : null}
+          <label>{devices.length} device(s)</label>
         </div>
         <div className="col-md-2">
           {connected ? (
@@ -47,7 +59,7 @@ const MiscControls = ({
             className="btn btn-sm btn-secondary"
             onClick={requestCurrentPreset}
           >
-            Get Preset
+            Refresh
           </button>
         </div>
         <div className="col-md-2">

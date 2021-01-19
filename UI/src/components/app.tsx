@@ -9,6 +9,8 @@ import MiscControls from "./misc-controls";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../css/styles.css";
 import AppViewModel from "../core/appViewModel";
+import { BluetoothDeviceInfo } from "../spork/src/interfaces/deviceController";
+
 import { useEffect } from "react";
 
 let viewModel: AppViewModel = new AppViewModel();
@@ -17,6 +19,7 @@ const App = () => {
   const onViewModelStateChange = () => {
     setCurrentPreset(viewModel.preset);
     setConnected(viewModel.isConnected);
+    setDevices(viewModel.devices);
   };
 
   useEffect(() => {
@@ -37,22 +40,45 @@ const App = () => {
   const [connectionInProgress, setConnectionInProgress] = React.useState(false);
   const [connected, setConnected] = React.useState(false);
   const [currentPreset, setCurrentPreset] = React.useState({});
+  const [devices, setDevices] = React.useState<BluetoothDeviceInfo[]>([]);
+  const [deviceScanInProgress, setDeviceScanInProgress] = React.useState(false);
+
+  const [
+    selectedDevice,
+    setSelectedDevice,
+  ] = React.useState<BluetoothDeviceInfo>(null);
 
   const scanForDevices = () => {
-    setConnectionInProgress(true);
+    setDeviceScanInProgress(true);
 
     viewModel.scanForDevices().then((ok) => {
-     
-      setConnectionInProgress(false);
-
+      setDeviceScanInProgress(false);
     });
   };
 
+  const connectDevice = (targetDeviceAddress: string = null) => {
+    if (devices.length == 0) {
+      return;
+    }
 
-  const connectDevice = () => {
     setConnectionInProgress(true);
 
-    viewModel.connectDevice().then((ok) => {
+    // if no target device specified connect to first known device.
+
+    let currentDevice = selectedDevice;
+    if (devices.length > 0 && selectedDevice == null) {
+      if (targetDeviceAddress != null) {
+        currentDevice = devices.find((d) => d.address == targetDeviceAddress);
+      }
+
+      if (currentDevice == null) {
+        currentDevice = devices[0];
+      }
+
+      setSelectedDevice(currentDevice);
+    }
+
+    viewModel.connectDevice(currentDevice).then((ok) => {
       setConnected(true);
       setConnectionInProgress(false);
 
@@ -107,9 +133,17 @@ const App = () => {
     currentPreset,
   ]);
 
+  // perform startup
   useEffect(() => {
     console.log("Startup, connecting..");
-   // connectDevice();
+    scanForDevices();
+
+    setTimeout(() => {
+      if (devices.length > 0) {
+        connectDevice();
+      }
+      // auto connect
+    });
   }, []);
 
   const [presetConfig, setPresetConfig] = React.useState({});
@@ -124,12 +158,14 @@ const App = () => {
       <Row>
         <Col>
           <MiscControls
+            deviceScanInProgress={deviceScanInProgress}
             onScanForDevices={scanForDevices}
             connected={connected}
             onConnect={connectDevice}
             connectionInProgress={connectionInProgress}
             requestCurrentPreset={requestCurrentPreset}
             setChannel={setChannel}
+            devices={devices}
           ></MiscControls>
         </Col>
       </Row>

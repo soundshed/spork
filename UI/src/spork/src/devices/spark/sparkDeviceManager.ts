@@ -1,4 +1,4 @@
-import { DeviceController } from "../../interfaces/deviceController";
+import { DeviceController, BluetoothDeviceInfo } from "../../interfaces/deviceController";
 import { DeviceState, FxCatalogItem } from "../../interfaces/preset";
 import { SparkCommandMessage } from "./sparkCommandMessage";
 import { FxCatalogProvider } from "./sparkFxCatalog";
@@ -19,8 +19,8 @@ export class SparkDeviceManager implements DeviceController {
 
 
 
-    constructor(deviceAddress) {
-        this.deviceAddress = deviceAddress
+    constructor() {
+
         this.btSerial = new (require('bluetooth-serial-port')).BluetoothSerialPort();
 
         this.btSerial.on('data', (buffer) => {
@@ -46,42 +46,60 @@ export class SparkDeviceManager implements DeviceController {
         });
     }
 
-    public async scanForDevices()  {
-       
-        let devices=[];
-        return new Promise((resolve,reject)=>{
+    public async scanForDevices(): Promise<any> {
 
-            this.btSerial.inquire();
-
-            this.btSerial.on('found',  (address, name)=> {
-                this.log("addr:" + address + " name:" + name)
-            
-                if (name == "Spark 40 Audio") {
-            
-                    btSerial.findSerialPortChannel(address,  (channel) =>{
-                        devices.push({name:name,address:address,port:channel});
-                    });
-                }
-            });
-            
-            setTimeout(()=>
-                resolve(devices)
-            ,3000);
-           
-        });
-    }
-
-    public async connect(): Promise<boolean> {
+        let devices: BluetoothDeviceInfo[] = [];
 
         return new Promise((resolve, reject) => {
 
-            this.btSerial.connect(this.deviceAddress, 2, () => {
-                this.log('bluetooth device connected');
+            let resolutionTimeout;
+
+            devices = [];
+            // find bluetooth devices, identify spark devices and capture the device address and name. 
+            // On each discovery, clear the resolution timeout so that the last item is the one that completes.
+            this.btSerial.on('found', (address: string, name: string) => {
+                this.log("addr:" + JSON.stringify(address) + " name:" + name)
+
+                if (name == "Spark 40 Audio") {
+
+                    address = address.replace(name, "").replace("(", "").replace(")", "");
+                    devices.push({ name: name, address: address, port: 2 });
+                }
+
+                if (resolutionTimeout) {
+                    clearTimeout(resolutionTimeout);
+                }
+
+                resolutionTimeout = setTimeout(() =>
+                    resolve(devices)
+                    , 500);
+
+            });
+
+            try {
+                this.btSerial.inquire();
+
+            } catch {
+                reject();
+            }
+
+
+
+
+        });
+    }
+
+    public async connect(device: BluetoothDeviceInfo): Promise<boolean> {
+
+        return new Promise((resolve, reject) => {
+
+            this.btSerial.connect(device.address, device.port, () => {
+                this.log('bluetooth device connected: ' + device.name);
 
                 resolve(true);
 
             }, () => {
-                this.log('cannot connect');
+                this.log(`cannot connect to device [${device.address} ${device.name}]`);
 
                 if (this.onStateChanged) {
                     this.onStateChanged({ type: "connection", status: "failed" });
@@ -107,7 +125,7 @@ export class SparkDeviceManager implements DeviceController {
 
     public async readStateMessage() {
 
-        this.log("Reading state message" ); //+ this.buf2hex(this.latestStateReceived));
+        this.log("Reading state message"); //+ this.buf2hex(this.latestStateReceived));
 
 
         let reader = this.reader;

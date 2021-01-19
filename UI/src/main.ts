@@ -10,11 +10,12 @@ try {
 
 let win: BrowserWindow;
 
-const sendMessage = (type: string, msg: string) => {
+const sendMessageToApp = (type: string, msg: string) => {
     if (win) {
+        // send message to be handled by the UI/app (appViewModel)
         win.webContents.send(type, msg);
     }
-} 
+}
 
 function createWindow() {
     win = new BrowserWindow({
@@ -29,41 +30,43 @@ function createWindow() {
     win.loadFile('index.html');
 }
 
-const deviceManager = new SparkDeviceManager("08:EB:ED:8F:84:0B");
+const deviceManager = new SparkDeviceManager();
+
+deviceManager.onStateChanged = (s: any) => {
+    console.log("main.ts: device state changed")
+    sendMessageToApp('device-state-changed', s);
+};
 
 ipcMain.handle('perform-action', (event, args) => {
     // ... do actions on behalf of the Renderer
     console.log("got event from render:" + args.action);
 
-    
     if (args.action == 'scan') {
-        deviceManager.scanForDevices().then((devices)=>{
+        deviceManager.scanForDevices().then((devices) => {
             console.log(JSON.stringify(devices));
+
+            sendMessageToApp('devices-discovered', devices);
         });
     }
 
     if (args.action == 'connect') {
-
-        deviceManager.onStateChanged = (s: any) => {
-            console.log("main.ts: device state changed")
-            onDeviceStateChanged(s)
-        };
-
+        console.log("attempting to connect:: " + JSON.stringify(args));
+        
         try {
-            deviceManager.connect().then(connectedOk => {
+            deviceManager.connect(args.data).then(connectedOk => {
                 if (connectedOk) {
-                    sendMessage("device-connection-changed", "connected")
-                   
+                    sendMessageToApp("device-connection-changed", "connected")
+
                     deviceManager.sendCommand("get_preset", 0);
 
                     //await deviceManager.sendPreset(preset1);
                 } else {
-                    sendMessage("device-connection-changed", "failed")
+                    sendMessageToApp("device-connection-changed", "failed")
                 }
 
             });
         } catch (e) {
-            sendMessage("device-connection-changed", "failed")
+            sendMessageToApp("device-connection-changed", "failed")
         }
     }
 
@@ -89,9 +92,6 @@ ipcMain.handle('perform-action', (event, args) => {
     }
 })
 
-function onDeviceStateChanged(deviceState: any) {
-    sendMessage('device-state-changed', deviceState);
-}
 
 ////////////////////////
 
