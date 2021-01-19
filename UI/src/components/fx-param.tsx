@@ -36,7 +36,7 @@ const FxParam = ({ type = "knob", p, fx, onFxParamChange }) => {
      // customElement?.removeEventListener("input", setParamValue);
      customElement?.removeEventListener("change", setParamValue);
     };
-  }, [setParamValue]);
+  }, []);
 
   return (
     <div key={p.index?.toString() ?? p.toString()}>

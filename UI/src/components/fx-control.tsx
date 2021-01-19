@@ -13,6 +13,10 @@ declare global {
 const FxControl = ({ fx, onFxParamChange, onFxToggle }) => {
 
 
+  React.useEffect(() => {
+    
+  }, [fx.active]);
+
   const paramControls = fx.params.map((p) => (
     <FxParam key={p.index.toString()} p={p} fx={fx} onFxParamChange={onFxParamChange}></FxParam>
   ));

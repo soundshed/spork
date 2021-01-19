@@ -71,8 +71,8 @@ const MiscControls = ({
             Set Preset
           </button>
         </div>
-        <div className="col-md-2">
-          Channel :   
+        <div className="col-md-4">
+          <label>Channel -    </label>
           <div
             className="btn-group"
             role="group"

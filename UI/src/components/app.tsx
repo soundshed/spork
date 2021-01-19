@@ -33,7 +33,7 @@ const App = () => {
 
       console.log("view model removed");
     };
-  });
+  },[]);
 
   // connection state
 
@@ -136,6 +136,7 @@ const App = () => {
   // perform startup
   useEffect(() => {
     console.log("Startup, connecting..");
+
     scanForDevices();
 
     setTimeout(() => {
@@ -143,7 +144,7 @@ const App = () => {
         connectDevice();
       }
       // auto connect
-    });
+    },2000);
   }, []);
 
   const [presetConfig, setPresetConfig] = React.useState({});

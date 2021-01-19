@@ -48,13 +48,13 @@ export class SparkDeviceManager implements DeviceController {
 
     public async scanForDevices(): Promise<any> {
 
-        let devices: BluetoothDeviceInfo[] = [];
+        
 
         return new Promise((resolve, reject) => {
 
             let resolutionTimeout;
 
-            devices = [];
+            let devices: BluetoothDeviceInfo[] = [];
             // find bluetooth devices, identify spark devices and capture the device address and name. 
             // On each discovery, clear the resolution timeout so that the last item is the one that completes.
             this.btSerial.on('found', (address: string, name: string) => {
@@ -63,7 +63,11 @@ export class SparkDeviceManager implements DeviceController {
                 if (name == "Spark 40 Audio") {
 
                     address = address.replace(name, "").replace("(", "").replace(")", "");
-                    devices.push({ name: name, address: address, port: 2 });
+                    if (!devices.find(d=>d.address==address))
+                    {
+                        devices.push({ name: name, address: address, port: 2 });
+                    }
+                   
                 }
 
                 if (resolutionTimeout) {

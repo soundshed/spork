@@ -14,7 +14,7 @@ export class AppViewModel {
 
     public isConnected: boolean = false;
     public preset: Preset = {};
-    public selectedChannel: number = 1;
+    public selectedChannel: number = -1;
     public devices: BluetoothDeviceInfo[];
 
     public messages = [];
@@ -48,6 +48,12 @@ export class AppViewModel {
 
             if (args.lastMessageReceived) {
                 this.messages.push(args.lastMessageReceived);
+
+                if (args.lastMessageReceived.presetNumber && args.lastMessageReceived.presetNumber != this.selectedChannel) {
+                    this.selectedChannel = args.lastMessageReceived.presetNumber;
+                    // preset number has changed, refresh the details
+                    this.requestPresetConfig();
+                }
             }
 
             this.onStateChangeHandler();
