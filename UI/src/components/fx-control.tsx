@@ -15,7 +15,7 @@ const FxControl = ({ fx, onFxParamChange, onFxToggle }) => {
 
   React.useEffect(() => {
     
-  }, [fx.active]);
+  }, [fx]);
 
   const paramControls = fx.params.map((p) => (
     <FxParam key={p.index.toString()} p={p} fx={fx} onFxParamChange={onFxParamChange}></FxParam>

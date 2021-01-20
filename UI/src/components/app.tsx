@@ -12,6 +12,7 @@ import AppViewModel from "../core/appViewModel";
 import { BluetoothDeviceInfo } from "../spork/src/interfaces/deviceController";
 
 import { useEffect } from "react";
+import { Preset } from "../spork/src/interfaces/preset";
 
 let viewModel: AppViewModel = new AppViewModel();
 
@@ -20,6 +21,7 @@ const App = () => {
     setCurrentPreset(viewModel.preset);
     setConnected(viewModel.isConnected);
     setDevices(viewModel.devices);
+    setFavourites(viewModel.storedPresets);
   };
 
   useEffect(() => {
@@ -33,7 +35,7 @@ const App = () => {
 
       console.log("view model removed");
     };
-  },[]);
+  }, []);
 
   // connection state
 
@@ -42,21 +44,28 @@ const App = () => {
   const [currentPreset, setCurrentPreset] = React.useState({});
   const [devices, setDevices] = React.useState<BluetoothDeviceInfo[]>([]);
   const [deviceScanInProgress, setDeviceScanInProgress] = React.useState(false);
+  const [selectedChannel, setSelectedChannel] = React.useState(
+    viewModel.selectedChannel
+  );
+  const [presetConfig, setPresetConfig] = React.useState({});
+  const [favourites, setFavourites]= React.useState(viewModel.storedPresets);
 
   const [
     selectedDevice,
     setSelectedDevice,
   ] = React.useState<BluetoothDeviceInfo>(null);
 
-  const scanForDevices = () => {
+  const requestScanForDevices = () => {
     setDeviceScanInProgress(true);
 
     viewModel.scanForDevices().then((ok) => {
-      setDeviceScanInProgress(false);
+      setTimeout(() => {
+        setDeviceScanInProgress(false);
+      }, 5000);
     });
   };
 
-  const connectDevice = (targetDeviceAddress: string = null) => {
+  const requestConnectDevice = (targetDeviceAddress: string = null) => {
     if (devices.length == 0) {
       return;
     }
@@ -103,13 +112,32 @@ const App = () => {
     });
   };
 
-  const setChannel = (channelNum: number) => {
+  const requestSetChannel = (channelNum: number) => {
     setConnectionInProgress(true);
 
     viewModel.setChannel(channelNum).then((ok) => {
       setConnectionInProgress(false);
+      setSelectedChannel(channelNum);
     });
   };
+
+  const requestSetPreset = () => {
+
+    let preset:Preset = currentPreset;
+    preset.sigpath[3].dspId="94MatchDCV2";
+    
+    setConnectionInProgress(true);
+
+    viewModel.requestPresetChange(preset).then((ok) => {
+      setConnectionInProgress(false);
+      
+    });
+  };
+
+  const requestStoreFavourite = ()=>{
+    //save current preset
+    viewModel.storeFavourite(currentPreset);
+  }
 
   const fxParamChange = (args) => {
     viewModel.requestFxParamChange(args).then(() => {});
@@ -126,7 +154,7 @@ const App = () => {
         "re-render because connection changed:",
         connectionInProgress
       ),
-    [connectionInProgress, connected]
+    [connectionInProgress, connected, deviceScanInProgress]
   );
 
   useEffect(() => console.log("re-render because preset changed"), [
@@ -137,17 +165,16 @@ const App = () => {
   useEffect(() => {
     console.log("Startup, connecting..");
 
-    scanForDevices();
+    requestScanForDevices();
 
     setTimeout(() => {
       if (devices.length > 0) {
-        connectDevice();
+        requestConnectDevice();
+        viewModel.getDeviceName();
       }
       // auto connect
-    },2000);
+    }, 2000);
   }, []);
-
-  const [presetConfig, setPresetConfig] = React.useState({});
 
   return (
     <Container>
@@ -160,13 +187,15 @@ const App = () => {
         <Col>
           <MiscControls
             deviceScanInProgress={deviceScanInProgress}
-            onScanForDevices={scanForDevices}
+            onScanForDevices={requestScanForDevices}
             connected={connected}
-            onConnect={connectDevice}
+            onConnect={requestConnectDevice}
             connectionInProgress={connectionInProgress}
             requestCurrentPreset={requestCurrentPreset}
-            setChannel={setChannel}
+            setChannel={requestSetChannel}
             devices={devices}
+            selectedChannel={selectedChannel}
+            onSetPreset={requestSetPreset}
           ></MiscControls>
         </Col>
       </Row>
@@ -176,7 +205,14 @@ const App = () => {
             signalPathState={currentPreset}
             onFxParamChange={fxParamChange}
             onFxToggle={fxToggle}
+            selectedChannel={selectedChannel}
+            onStoreFavourite={requestStoreFavourite}
           ></SignalPathControl>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <pre>{JSON.stringify(favourites)}</pre>
         </Col>
       </Row>
     </Container>

@@ -185,7 +185,8 @@ for (let i = 0; i < preset_list.length; i++) {
 
     // test hex version of preset matches computed value
     for (let x = 0; x < b.length; x++) {
-        if (toHex(b[x]) != preset_listh[i][x]) {
+        let hexOfComputedMessage = toHex(b[x]);
+        if ( hexOfComputedMessage!= preset_listh[i][x]) {
             console.log(`Preset ${preset_list[i]["Name"]} failed test in block ${x}`)
 
             console.log("computed:" + toHex(b[x]))

@@ -34,13 +34,16 @@ export class SparkDeviceManager implements DeviceController {
 
             if (buffer[buffer.length - 1] == 0xf7) {
                 // end message 
-                this.readStateMessage();
 
-                this.log('Receive last message in batch, processing message ' + this.latestStateReceived.length);
+
+                this.log('Received last message in batch, processing message ' + this.latestStateReceived.length);
 
                 //this.log(JSON.stringify(this.reader.deviceState))
 
-                this.latestStateReceived = [];
+                this.readStateMessage().then(() => {
+                    this.latestStateReceived = [];
+                });
+
             }
 
         });
@@ -48,7 +51,7 @@ export class SparkDeviceManager implements DeviceController {
 
     public async scanForDevices(): Promise<any> {
 
-        
+
 
         return new Promise((resolve, reject) => {
 
@@ -63,11 +66,10 @@ export class SparkDeviceManager implements DeviceController {
                 if (name == "Spark 40 Audio") {
 
                     address = address.replace(name, "").replace("(", "").replace(")", "");
-                    if (!devices.find(d=>d.address==address))
-                    {
+                    if (!devices.find(d => d.address == address)) {
                         devices.push({ name: name, address: address, port: 2 });
                     }
-                   
+
                 }
 
                 if (resolutionTimeout) {
@@ -197,17 +199,43 @@ export class SparkDeviceManager implements DeviceController {
         let msgArray = [];
 
         if (type == "set_preset") {
+            this.log("Setting preset");
             msgArray = msg.create_preset(data);
         }
 
+        if (type == "set_preset_from_model") {
+            this.log("Setting preset");
+            msgArray = msg.create_preset_from_model(data);
+        }
+
+        if (type == "store_current_preset") {
+            this.log("Storing preset");
+            msgArray = msg.store_current_preset(data);
+        }
+
         if (type == "set_channel") {
+            this.log("Setting hardware channel");
             msgArray = msg.change_hardware_preset(data);
+        }
+
+        if (type == "change_amp") {
+            this.log("Changing Amp " + JSON.stringify(data));
+            msgArray = msg.change_amp(data.dspIdOld, data.dspIdNew);
+        }
+
+        if (type == "set_amp_param") {
+            this.log("Changing Amp Param " + JSON.stringify(data));
+            msgArray = msg.change_amp_parameter(data.dspId, data.index, data.value);
+        }
+
+        if (type == "change_fx") {
+            this.log("Changing Effect " + JSON.stringify(data));
+            msgArray = msg.change_effect(data.dspIdOld, data.dspIdNew);
         }
 
         if (type == "set_fx_onoff") {
             this.log("Toggling Effect " + JSON.stringify(data));
             msgArray = msg.turn_effect_onoff(data.dspId, data.value == 1 ? "On" : "Off");
-
         }
 
         if (type == "set_fx_param") {
@@ -216,90 +244,42 @@ export class SparkDeviceManager implements DeviceController {
         }
 
         if (type == "get_preset") {
+            this.log("Getting preset");
             msgArray = msg.request_preset_state();
         }
 
-        if (type == "get_devicename") {
+        if (type == "get_device_name") {
+            this.log("Getting device name");
+            msgArray = msg.request_info(0x11);
+        }
+
+        if (type == "get_device_serial") {
+            this.log("Getting device serial");
             msgArray = msg.request_info(0x23);
         }
 
         for (let msg of msgArray) {
-            this.btSerial.write(Buffer.from(msg), (err, bytesWritten) => {
+            this.log("Sending: " + this.buf2hex(msg));
+            this.btSerial.write(Buffer.from(msg), async (err, bytesWritten) => {
                 if (err) this.log(err);
+
+                // wait for ack
+               /* let currentStateTime = this.lastStateTime;
+                while (this.lastStateTime == currentStateTime) {
+                    await this.sleep(100);
+                    this.log("Waiting for ack..")
+                }*/
+
+                //this.log("Got ack..")
             });
-            await this.sleep(100);
+
         }
+
+        this.log("Sent.: ");
 
     }
 
     private log(msg) {
         console.log("[Spark Device Manager] : " + msg);
     }
-
-    public getFxCatalog() {
-
-
-        let fxCatalog: Array<FxCatalogItem> = [
-            // noise gate
-            {
-
-                type: "gate", dspId: "bias.noisegate", name: "Noise Gate", params: [
-                    { index: 0, value: 0.2, name: "Threshold" },
-                    { index: 1, value: 0.05, name: "Decay" },
-                    { index: 2, value: 1, name: "On/Off", type: "switch" },
-
-                ]
-            },
-            // amps
-            {
-
-                type: "amp", dspId: "94MatchDCV2", name: "94MatchDCV2 Comp", params: [
-                    { index: 0, value: 0.5, name: "Gain" },
-                    { index: 1, value: 0.3, name: "Bass" },
-                    { index: 2, value: 0.4, name: "Middle" },
-                    { index: 3, value: 0.4, name: "Treble" },
-                    { index: 4, value: 0.7, name: "Volume" },
-
-                ],
-            },
-            // comp
-            {
-
-                type: "comp", dspId: "BBEOpticalComp", name: "Optical Comp", params: [
-                    { index: 0, value: 0.6, name: "Volume (-/+ 6dB)" },
-                    { index: 1, value: 0.4, name: "Comp" },
-                    { index: 2, value: false, name: "Pad (0dB/15dB)_" }
-                ]
-            },
-            // drive
-            {
-
-                type: "drive", dspId: "DistortionTS9", name: "Tube Drive", params: [
-                    { index: 0, value: 0.5, name: "Overdrive" },
-                    { index: 1, value: 0.5, name: "Tone" },
-                    { index: 2, value: 0.6, name: "Level" }
-                ]
-            },
-            //reverb
-
-            {
-
-                type: "reverb", dspId: "bias.reverb", name: "Ambient", params: [
-                    { name: "Level", index: 0, value: 0.8 },
-                    { name: "Damping", index: 1, value: 0.2 },
-                    { name: "Low Cut", index: 2, value: 0.8 },
-                    { name: "High Cut", index: 3, value: 0.7 },
-                    { name: "Dwell", index: 4, value: 0.3 },
-                    { name: "Time", index: 5, value: 0.5 }
-                ]
-            }
-
-
-        ];
-
-
-
-        return fxCatalog;
-    }
-
 }

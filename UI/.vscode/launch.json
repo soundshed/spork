@@ -12,6 +12,18 @@
       },
       "args": ["./build/main.js"],
       "outputCapture": "std"
-    }
+    },{
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Test Spark Message",
+      "skipFiles": [
+          "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\build\\spork\\src\\test\\sparkTester.js",
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+      ]
+  }
   ]
 }

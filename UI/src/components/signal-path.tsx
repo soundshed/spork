@@ -13,7 +13,11 @@ const SignalPathControl = ({
   signalPathState,
   onFxParamChange,
   onFxToggle,
+  selectedChannel,
+  onStoreFavourite
 }) => {
+  React.useEffect(() => {}, [signalPathState, selectedChannel]);
+
   if (signalPathState.sigpath == null) signalPathState.sigpath = [];
 
   const listItems = signalPathState.sigpath.map((fx) => (
@@ -28,12 +32,19 @@ const SignalPathControl = ({
 
   return (
     <div>
-      <div className="container">
-        <h6>Signal Chain</h6>
+      {(!signalPathState || signalPathState.sigpath == []) ? (
+        <label>Refresh to get current amp settings.</label>
+      ) : (
+        <div className="container">
+          <h6>Signal Chain</h6>
 
-        <h4 className="preset-name">{signalPathState.meta?.name}</h4>
-        <div className="row">{listItems}</div>
-      </div>
+          <h4 className="preset-name">
+            [{selectedChannel + 1}] {signalPathState.meta?.name}
+          </h4>
+          <button onClick={onStoreFavourite}>⭐</button>
+          <div className="row">{listItems}</div>
+        </div>
+      )}
     </div>
   );
 };

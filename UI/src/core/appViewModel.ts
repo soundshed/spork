@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 import { BluetoothDeviceInfo } from '../spork/src/interfaces/deviceController';
-import { Preset } from '../spork/src/interfaces/preset';
+import { FxChangeMessage, Preset } from '../spork/src/interfaces/preset';
 
 const debounce = (func, delay) => {
     let timerId;
@@ -16,6 +16,8 @@ export class AppViewModel {
     public preset: Preset = {};
     public selectedChannel: number = -1;
     public devices: BluetoothDeviceInfo[];
+
+    public storedPresets: Preset[] = [];
 
     public messages = [];
     public statusMessage = "";
@@ -106,7 +108,32 @@ export class AppViewModel {
         return true;
     }
 
-    async requestFxParamChangeImmediate(args) {
+    async requestPresetChange(args: Preset) {
+        return ipcRenderer.invoke('perform-action', { action: 'applyPreset', data: args }).then(
+            () => {
+
+            });
+        return true;
+    }
+
+
+    async requestAmpChange(args: FxChangeMessage) {
+        return ipcRenderer.invoke('perform-action', { action: 'changeAmp', data: args }).then(
+            () => {
+
+            });
+        return true;
+    }
+
+    async requestFxChange(args: FxChangeMessage) {
+        return ipcRenderer.invoke('perform-action', { action: 'changeFx', data: args }).then(
+            () => {
+
+            });
+        return true;
+    }
+
+    private async requestFxParamChangeImmediate(args) {
         return ipcRenderer.invoke('perform-action', { action: 'setFxParam', data: args }).then(
             () => {
 
@@ -139,6 +166,45 @@ export class AppViewModel {
                 this.log("Completed preset query");
             });
         return true;
+    }
+
+    async getDeviceName(): Promise<boolean> {
+        await ipcRenderer.invoke('perform-action', { action: 'getDeviceName', data: {} }).then(
+            () => {
+
+            });
+        return true;
+    }
+
+    async getDeviceSerial(): Promise<boolean> {
+        await ipcRenderer.invoke('perform-action', { action: 'getDeviceSerial', data: {} }).then(
+            () => {
+
+            });
+        return true;
+    }
+
+    async storeFavourite(preset: Preset): Promise<boolean> {
+
+        if (preset != null) {
+            let favourites: Preset[] = [];
+            let allPresets = localStorage.getItem("favourites");
+            if (allPresets == null) {
+                favourites = JSON.parse(allPresets);
+            }
+
+            favourites.push(preset);
+            localStorage.setItem("favourites", JSON.stringify(favourites));
+
+            this.storedPresets = favourites;
+
+            this.onStateChangeHandler();
+            return true;
+        }
+        else {
+            return false;
+        }
+
     }
 }
 

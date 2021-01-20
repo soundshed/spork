@@ -8,8 +8,21 @@ const MiscControls = ({
   requestCurrentPreset,
   setChannel,
   onScanForDevices,
-  devices
+  devices,
+  selectedChannel,
+  onSetPreset
 }) => {
+
+  React.useEffect(() => {
+    // watch for changes
+  }, [
+    deviceScanInProgress,
+    connected,
+    connectionInProgress,
+    devices,
+    selectedChannel,
+  ]);
+
   return (
     <div className="container ">
       <div className="row control-strip">
@@ -18,16 +31,17 @@ const MiscControls = ({
             type="button"
             className="btn btn-sm btn-primary"
             onClick={onScanForDevices}
-          >Scan</button>
+          >
+            Scan
+          </button>
 
-{deviceScanInProgress ? (
-                  <span
-                   
-                    className="spinner-border spinner-border-sm"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                ) : null}
+          {deviceScanInProgress ==true? (
+            <span
+              className="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          ) : null}
           <label>{devices.length} device(s)</label>
         </div>
         <div className="col-md-2">
@@ -67,12 +81,14 @@ const MiscControls = ({
             type="button"
             className="btn btn-sm btn-secondary"
             id="applyPreset"
+
+            onClick={onSetPreset}
           >
             Set Preset
           </button>
         </div>
         <div className="col-md-4">
-          <label>Channel -    </label>
+          <label>Channel - </label>
           <div
             className="btn-group"
             role="group"
@@ -80,40 +96,56 @@ const MiscControls = ({
           >
             <button
               type="button"
-              className="btn btn-sm btn-secondary"
+              className={
+                selectedChannel == 0
+                  ? "btn btn-sm btn-secondary active"
+                  : "btn btn-sm btn-secondary"
+              }
               id="ch1"
               onClick={() => {
-                setChannel(1);
+                setChannel(0);
               }}
             >
               1
             </button>
             <button
               type="button"
-              className="btn btn-sm btn-secondary"
+              className={
+                selectedChannel == 1
+                  ? "btn btn-sm btn-secondary active"
+                  : "btn btn-sm btn-secondary"
+              }
               id="ch2"
               onClick={() => {
-                setChannel(2);
+                setChannel(1);
               }}
             >
               2
             </button>
             <button
               type="button"
-              className="btn btn-sm btn-secondary"
+              className={
+                selectedChannel == 2
+                  ? "btn btn-sm btn-secondary active"
+                  : "btn btn-sm btn-secondary"
+              }
               id="ch3"
               onClick={() => {
-                setChannel(3);
+                setChannel(2);
               }}
             >
               3
             </button>
             <button
               type="button"
-              className="btn btn-sm btn-secondary"
+              className={
+                selectedChannel == 3
+                  ? "btn btn-sm btn-secondary active"
+                  : "btn btn-sm btn-secondary"
+              }
               id="ch4"
               onClick={() => {
-                setChannel(4);
+                setChannel(3);
               }}
             >
               4
