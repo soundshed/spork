@@ -34,6 +34,14 @@ module.exports = {
 						loader: 'file-loader'
 					}
 				]
+			},
+			{
+				test: /\.(png|jpe?g|gif)$/i,
+				use: [
+					{
+						loader: 'file-loader'
+					}
+				]
 			}
 		]
 	},
@@ -44,7 +52,8 @@ module.exports = {
 		new CopyPlugin({
 			patterns: [
 				{ from: './css', to: 'css' },
-				{ from: './lib', to: 'lib' }
+				{ from: './lib', to: 'lib' },
+				{ from: './images', to: 'images' }
 			]
 		})
 	]

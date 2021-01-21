@@ -1,7 +1,7 @@
 //import { SparkManager } from './lib/spork/sparkManager';
 import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron';
 import { SparkDeviceManager } from './spork/src/devices/spark/sparkDeviceManager';
-import installExtension, { REACT_DEVELOPER_TOOLS  } from 'electron-devtools-installer';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
 
 try {
@@ -65,7 +65,10 @@ ipcMain.handle('perform-action', (event, args) => {
                     sendMessageToApp("device-connection-changed", "failed")
                 }
 
+            }).catch(err => {
+                sendMessageToApp("device-connection-changed", "failed")
             });
+            
         } catch (e) {
             sendMessageToApp("device-connection-changed", "failed")
         }
@@ -77,10 +80,10 @@ ipcMain.handle('perform-action', (event, args) => {
         // send preset
         deviceManager.sendCommand("set_preset", p);
 
-        setTimeout(()=>{
-                //apply preset to virtual channel 127
-                deviceManager.sendCommand("set_channel", 127);
-        },500);
+        setTimeout(() => {
+            //apply preset to virtual channel 127
+            deviceManager.sendCommand("set_channel", 127);
+        }, 500);
         //deviceManager.sendCommand("set_preset_from_model", args.data);
     }
 
@@ -120,8 +123,8 @@ ipcMain.handle('perform-action', (event, args) => {
 
 ////////////////////////
 
-app.whenReady().then(()=>{
-    
+app.whenReady().then(() => {
+
     /*installExtension(REACT_DEVELOPER_TOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log('An error occurred: ', err));*/

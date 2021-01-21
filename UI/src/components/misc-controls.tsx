@@ -42,7 +42,7 @@ const MiscControls = ({
               aria-hidden="true"
             ></span>
           ) : null}
-          <label>{devices.length} device(s)</label>
+          <label>{devices?.length} device(s)</label>
         </div>
         <div className="col-md-2">
           {connected ? (

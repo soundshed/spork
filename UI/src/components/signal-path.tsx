@@ -41,7 +41,9 @@ const SignalPathControl = ({
           <h4 className="preset-name">
             [{selectedChannel + 1}] {signalPathState.meta?.name}
           </h4>
-          <button onClick={onStoreFavourite}>⭐</button>
+          <button className="btn btn-primary" onClick={onStoreFavourite}>⭐ Favourite</button>
+
+          <button className="btn btn-secondary" onClick={onStoreFavourite}>☁ Upload</button>
           <div className="row">{listItems}</div>
         </div>
       )}
