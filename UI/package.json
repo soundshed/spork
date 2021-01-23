@@ -1,21 +1,23 @@
 {
   "name": "spork-ui",
   "version": "1.0.0",
-  "description": "",
+  "description": "Browse and manage favourite tones, preview or store on your amp.",
   "main": "./build/main.bundle.js",
   "scripts": {
     "build": "npx tsc && webpack --config ./webpack.config.js",
-    "watch": "webpack -w --config ./webpack.config.js",
+    "watch": "concurrently \"tsc -w\" \"webpack -w --config ./webpack.config.js\"",
     "start": "npm run build && electron ./build/main.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
+    "concurrently": "^5.3.0",
     "copy-webpack-plugin": "^7.0.0",
     "css-loader": "^5.0.1",
     "electron": "^11.1.1",
@@ -38,59 +40,24 @@
     "bluetooth-serial-port": "",
     "bootstrap": "^5.0.0-beta1",
     "install": "^0.13.0",
+    "nanoid": "^3.1.20",
     "npm": "^6.14.11",
     "react-bootstrap": "^1.4.3",
     "react-router-dom": "^5.2.0"
   },
   "build": {
-    "name": "soundshed",
-    "version": "0.1.0",
-    "private": true,
-    "homepage": "./",
-    "build": {
-      "appId": "com.soundshed.tonemanager",
-      "directories": {
-        "buildResources": "assets"
-      },
-      "win": {
-        "category": "Music",
-        "iconUrl": "path-to-icon.png"
-      },
-      "mac": {
-        "category": "Music",
-        "iconUrl": "path-to-icon.png"
-      }
-    },
-    "dependencies": {
-      "electron": "^6.0.12",
-      "react": "^16.10.2",
-      "react-dom": "^16.10.2",
-      "react-scripts": "3.2.0"
-    },
-    "scripts": {
-      "electron": "electron .",
-      "start": "react-scripts start",
-      "build": "react-scripts build",
-      "test": "react-scripts test",
-      "eject": "react-scripts eject"
-    },
-    "eslintConfig": {
-      "extends": "react-app"
-    },
-    "browserslist": {
-      "production": [
-        ">0.2%",
-        "not dead",
-        "not op_mini all"
-      ],
-      "development": [
-        "last 1 chrome version",
-        "last 1 firefox version",
-        "last 1 safari version"
+    "productName": "soundshed",
+    "appId": "com.soundshed.tones",
+    "files": [
+      "build/",
+      "node_modules/",
+      "index.html",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
       ]
-    },
-    "devDependencies": {
-      "electron-builder": "^22.9.1"
     }
   }
 }

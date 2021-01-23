@@ -1,42 +1,24 @@
 import * as React from "react";
-
-import * as ReactDOM from "react-dom";
-
-import { BrowserRouter as Router } from "react-router-dom";
+import { useEffect } from "react";
 
 import SignalPathControl from "./signal-path";
 import DeviceControls from "./device-controls";
 import MiscControls from "./misc-controls";
-
-import DeviceViewModel from "../core/deviceViewModel";
 import { BluetoothDeviceInfo } from "../spork/src/interfaces/deviceController";
 
-import { useEffect } from "react";
 import { Preset } from "../spork/src/interfaces/preset";
-import AppViewModel from "../core/appViewModel";
+import { AppViewModelContext, DeviceViewModelContext } from "./app";
 
-let viewModel: DeviceViewModel = new DeviceViewModel();
+const DeviceMainControl = () => {
+  const appViewModel = React.useContext(AppViewModelContext);
+  const deviceViewModel = React.useContext(DeviceViewModelContext);
 
-const DeviceMainControl = (appViewModel:AppViewModel) => {
   const onViewModelStateChange = () => {
-    setCurrentPreset(viewModel.preset);
-    setConnected(viewModel.isConnected);
-    setDevices(viewModel.devices);
-    setFavourites(viewModel.storedPresets);
+    setCurrentPreset(deviceViewModel.preset);
+    setConnected(deviceViewModel.isConnected);
+    setDevices(deviceViewModel.devices);
+    setFavourites(deviceViewModel.storedPresets);
   };
-
-  useEffect(() => {
-    if (viewModel) {
-      viewModel.addStateChangeListener(onViewModelStateChange);
-      console.log("view model attached");
-    }
-
-    return () => {
-      viewModel.removeStateChangeListener();
-
-      console.log("view model removed");
-    };
-  }, []);
 
   // connection state
 
@@ -45,11 +27,9 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
   const [currentPreset, setCurrentPreset] = React.useState({});
   const [devices, setDevices] = React.useState<BluetoothDeviceInfo[]>([]);
   const [deviceScanInProgress, setDeviceScanInProgress] = React.useState(false);
-  const [selectedChannel, setSelectedChannel] = React.useState(
-    viewModel.selectedChannel
-  );
+  const [selectedChannel, setSelectedChannel] = React.useState(0);
   const [presetConfig, setPresetConfig] = React.useState({});
-  const [favourites, setFavourites] = React.useState(viewModel.storedPresets);
+  const [favourites, setFavourites] = React.useState([]);
 
   const [
     selectedDevice,
@@ -59,7 +39,7 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
   const requestScanForDevices = () => {
     setDeviceScanInProgress(true);
 
-    viewModel.scanForDevices().then((ok) => {
+    deviceViewModel.scanForDevices().then((ok) => {
       setTimeout(() => {
         setDeviceScanInProgress(false);
       }, 5000);
@@ -67,7 +47,7 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
   };
 
   const requestConnectDevice = (targetDeviceAddress: string = null) => {
-    if (devices.length == 0) {
+    if (devices == null || (devices?.length == 0 && !targetDeviceAddress)) {
       return;
     }
 
@@ -76,7 +56,7 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
     // if no target device specified connect to first known device.
 
     let currentDevice = selectedDevice;
-    if (devices.length > 0 && selectedDevice == null) {
+    if (devices?.length > 0 && selectedDevice == null) {
       if (targetDeviceAddress != null) {
         currentDevice = devices.find((d) => d.address == targetDeviceAddress);
       }
@@ -88,7 +68,13 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
       setSelectedDevice(currentDevice);
     }
 
-    viewModel.connectDevice(currentDevice).then((ok) => {
+    let deviceList = devices;
+    if (deviceList == null && selectedDevice) {
+      deviceList = [selectedDevice];
+    }
+
+    console.log("Connecting device..");
+    deviceViewModel.connectDevice(currentDevice).then((ok) => {
       setConnected(true);
       setConnectionInProgress(false);
 
@@ -101,14 +87,15 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
   const requestCurrentPreset = () => {
     setConnectionInProgress(true);
 
-    viewModel.requestPresetConfig().then((ok) => {
+    deviceViewModel.requestPresetConfig().then((ok) => {
       setConnectionInProgress(false);
       setTimeout(() => {
         console.log(
-          "updating preset config in UI " + JSON.stringify(viewModel.preset)
+          "updating preset config in UI " +
+            JSON.stringify(deviceViewModel.preset)
         );
 
-        setCurrentPreset(viewModel.preset);
+        setCurrentPreset(deviceViewModel.preset);
       }, 500);
     });
   };
@@ -116,7 +103,7 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
   const requestSetChannel = (channelNum: number) => {
     setConnectionInProgress(true);
 
-    viewModel.setChannel(channelNum).then((ok) => {
+    deviceViewModel.setChannel(channelNum).then((ok) => {
       setConnectionInProgress(false);
       setSelectedChannel(channelNum);
     });
@@ -128,58 +115,63 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
 
     setConnectionInProgress(true);
 
-    viewModel.requestPresetChange(preset).then((ok) => {
+    deviceViewModel.requestPresetChange(preset).then((ok) => {
       setConnectionInProgress(false);
     });
   };
 
-  const requestStoreFavourite = () => {
+  const requestStoreFavourite = (includeUpload:boolean=false) => {
     //save current preset
-    
-    appViewModel.storeFavourite(currentPreset);
+
+    appViewModel.storeFavourite(currentPreset, includeUpload);
   };
 
   const fxParamChange = (args) => {
-    viewModel.requestFxParamChange(args).then(() => {});
+    deviceViewModel.requestFxParamChange(args).then(() => {});
   };
 
   const fxToggle = (args) => {
-    viewModel.requestFxToggle(args).then(() => {});
+    deviceViewModel.requestFxToggle(args).then(() => {});
   };
 
   // configure which state changes should cause component updates
-  useEffect(
-    () =>
-      console.log(
-        "re-render because connection changed:",
-        connectionInProgress
-      ),
-    [connectionInProgress, connected, deviceScanInProgress]
-  );
-
-  useEffect(() => console.log("re-render because preset changed"), [
+  useEffect(() => {}, [
+    connectionInProgress,
+    connected,
+    deviceScanInProgress,
     currentPreset,
   ]);
 
-  // perform startup
   useEffect(() => {
-    console.log("Startup, connecting..");
+    //console.log("Device main - component created");
 
-   //viewModel.loadFavourites();
+    if (deviceViewModel) {
+      deviceViewModel.addStateChangeListener(onViewModelStateChange);
+    
+      // init state
+      onViewModelStateChange();
+    }
 
-   /* requestScanForDevices();
+    if (!deviceViewModel.isConnected) {
+      const lastConnectedDevice = deviceViewModel.getLastConnectedDevice();
 
-    setTimeout(() => {
-      if (devices.length > 0) {
-        requestConnectDevice();
-        viewModel.getDeviceName();
+      if (lastConnectedDevice) {
+        console.log(
+          "Re-connecting last known device [" + lastConnectedDevice.name + "]"
+        );
+        requestConnectDevice(lastConnectedDevice.address);
       }
-      // auto connect
-    }, 2000);*/
+    }
+
+    return () => {
+      if (deviceViewModel) {
+        deviceViewModel.removeStateChangeListener();
+      }
+    };
   }, []);
 
   return (
-    <div className="container m-2">
+    <div className="amp-intro">
       <div className="row">
         <div className="col">
           <DeviceControls></DeviceControls>
@@ -195,7 +187,7 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
             connectionInProgress={connectionInProgress}
             requestCurrentPreset={requestCurrentPreset}
             setChannel={requestSetChannel}
-            devices={devices}
+            devices={deviceViewModel.devices}
             selectedChannel={selectedChannel}
             onSetPreset={requestSetPreset}
           ></MiscControls>
@@ -212,7 +204,6 @@ const DeviceMainControl = (appViewModel:AppViewModel) => {
           ></SignalPathControl>
         </div>
       </div>
-      
     </div>
   );
 };

@@ -14,7 +14,9 @@ const DeviceControls = () => {
      
       <div>
         <div className="container">
-        <h6>Device Controls</h6>
+        <h6>Device Controls  <span className="badge rounded-pill bg-secondary">
+            Spark 40
+          </span></h6>
           <div className="row control-strip">
             <div className="col-sm">
               <webaudio-knob

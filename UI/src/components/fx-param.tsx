@@ -47,7 +47,7 @@ const FxParam = ({ type = "knob", p, fx, onFxParamChange }) => {
               customElement = elem;
               if (customElement) customElement.tag = p;
             }}
-            src="/lib/webaudio-controls/knobs/LittlePhatty.png"
+            src="./lib/webaudio-controls/knobs/LittlePhatty.png"
             min="0"
             value={p.value}
             max="1"
@@ -62,7 +62,7 @@ const FxParam = ({ type = "knob", p, fx, onFxParamChange }) => {
               customElement = elem;
               if (customElement) customElement.tag = p;
             }}
-            src="/lib/webaudio-controls/knobs/switch_toggle.png"
+            src="./lib/webaudio-controls/knobs/switch_toggle.png"
             value={fx.active == true ? "1" : "0"}
           ></webaudio-switch>
         </div>

@@ -1,4 +1,5 @@
 import { ipcRenderer } from 'electron';
+import { appendFileSync } from 'fs';
 import { BluetoothDeviceInfo } from '../spork/src/interfaces/deviceController';
 import { FxChangeMessage, Preset } from '../spork/src/interfaces/preset';
 
@@ -27,7 +28,13 @@ export class DeviceViewModel {
 
     private debouncedFXUpdate;
 
+    private defaultStateChangeHandler() {
+        this.log("UI Device state change handler called but not set.")
+    }
+
     constructor() {
+        this.onStateChangeHandler = this.defaultStateChangeHandler;
+
         this.setupElectronIPCListeners();
     }
 
@@ -36,7 +43,7 @@ export class DeviceViewModel {
     }
 
     removeStateChangeListener() {
-        this.onStateChangeHandler = null;
+        this.onStateChangeHandler = this.defaultStateChangeHandler;
     }
 
     setupElectronIPCListeners() {
@@ -95,9 +102,32 @@ export class DeviceViewModel {
         return true;
     }
 
+    getLastConnectedDevice(): BluetoothDeviceInfo {
+        let deviceJson = localStorage.getItem("lastConnectedDevice");
+        if (deviceJson) {
+            return <BluetoothDeviceInfo>JSON.parse(deviceJson);
+        } else {
+            return null;
+        }
+    }
+
     async connectDevice(device: BluetoothDeviceInfo): Promise<boolean> {
-        await ipcRenderer.invoke('perform-action', { action: 'connect', data: device });
-        return true;
+        if (device == null) return;
+
+        try {
+            return await ipcRenderer.invoke('perform-action', { action: 'connect', data: device }).then(() => {
+
+                // store last connected devices
+                this.isConnected = true;
+
+                localStorage.setItem("lastConnectedDevice", JSON.stringify(device));
+
+                return true;
+            });
+        } catch (err) {
+            return false;
+        }
+
     }
 
     async requestPresetConfig(): Promise<boolean> {

@@ -37,6 +37,7 @@ h1 {
 .fx {
     min-width: 100px;
     box-shadow: -1px 1px 9px 0px #020202cf;
+    background-color: #2d2d2da9;
 }
 .fx .preset-name {
     color: aliceblue;
@@ -108,6 +109,35 @@ label.fx-type {
 
 }
 
+.tones-intro{
+    background-image: url(/images/luana-azevedo-qSozrp4vyaA-unsplash.jpg);
+    background-size: cover;
+    width: 100%;
+    min-height: 900px;
+    background-position-x: center;
+    padding: 2em;
+
+}
+
+.amp-intro{
+    background-image: url(/images/jarrod-reed-LCsz65ObVow-unsplash.jpg);
+    background-size: cover;
+    width: 100%;
+    min-height: 900px;
+    background-position-x: center;
+    padding: 2em;
+
+}
+
+.about-intro{
+    background-image: url(/images/jarrod-reed-LCsz65ObVow-unsplash.jpg);
+    background-size: cover;
+    width: 100%;
+    min-height: 900px;
+    background-position-x: center;
+    padding: 2em;
+
+}
 .info{
     background-color: #2d2d2da9;
     color:white;

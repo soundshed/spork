@@ -14,7 +14,7 @@ const SignalPathControl = ({
   onFxParamChange,
   onFxToggle,
   selectedChannel,
-  onStoreFavourite
+  onStoreFavourite,
 }) => {
   React.useEffect(() => {}, [signalPathState, selectedChannel]);
 
@@ -32,18 +32,38 @@ const SignalPathControl = ({
 
   return (
     <div>
-      {(!signalPathState || signalPathState.sigpath == []) ? (
-        <label>Refresh to get current amp settings.</label>
+      {!signalPathState || signalPathState.sigpath.length==0 ? (
+        <div className="container">
+        <label>No preset selected (amp not connected). Connect and refresh to get current amp settings.</label>
+        </div>
       ) : (
         <div className="container">
-          <h6>Signal Chain</h6>
+          <h6>Tone Signal Chain</h6>
 
-          <h4 className="preset-name">
-            [{selectedChannel + 1}] {signalPathState.meta?.name}
-          </h4>
-          <button className="btn btn-primary" onClick={onStoreFavourite}>⭐ Favourite</button>
+          <div className="row">
+            <div className="col-md-8">
+              <h4 className="preset-name">
+                [{selectedChannel + 1}] {signalPathState.meta?.name}
+              </h4>
+            </div>
+            <div className="col-md-2">
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={onStoreFavourite}
+              >
+                ⭐ Favourite
+              </button>
+            </div>
+            <div className="col-md-2">
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={()=>{onStoreFavourite(true)}}
+              >
+                🔗 Share
+              </button>
+            </div>
+          </div>
 
-          <button className="btn btn-secondary" onClick={onStoreFavourite}>☁ Upload</button>
           <div className="row">{listItems}</div>
         </div>
       )}

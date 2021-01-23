@@ -10,7 +10,7 @@ const AboutControl = () => {
   };
 
   return (
-    <div className="container m-2">
+    <div className="about-intro">
       <h1>About</h1>
 
       <p>
@@ -31,6 +31,7 @@ const AboutControl = () => {
         https://github.com/paulhamsh/Spark-Parser
       </p>
       <p>Burning Guitar Photo by Dark Rider on Unsplash</p>
+      <p>Soundshed app by Christopher Cook</p>
     </div>
   );
 };
