@@ -10,11 +10,17 @@ const preset_h = [
 
 
 // https://stackoverflow.com/questions/38987784/how-to-convert-a-hexadecimal-string-to-uint8array-and-back-in-javascript
-const fromHexString = hexString => new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+const fromHexString = (hexString: string) => {
+    if (hexString == null) {
+        return "";
+    } else {
+        return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    }
+}
 
 let preset_snd = []
 for (let h of preset_h) {
-    let bytes =fromHexString(h);
+    let bytes = fromHexString(h);
     preset_snd.push(bytes)
 }
 

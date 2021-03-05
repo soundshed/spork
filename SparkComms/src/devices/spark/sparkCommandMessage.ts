@@ -8,6 +8,8 @@
 // Based on https://github.com/paulhamsh/Spark-Parser
 // Note: variable messages are sent using the msgpack structure
 
+import { Preset } from "../../interfaces/preset";
+
 var enc = new TextEncoder();
 
 function bytes(val): Uint8Array {
@@ -162,8 +164,8 @@ export class SparkCommandMessage {
     add_float(flt) {
         // float is a prefix of 0xCA with four bytes for float value (packed C struct), convert to js Float32 then reverse bytes
 
-        let floatArray=new Float32Array(1);
-        floatArray[0]=flt;
+        let floatArray = new Float32Array(1);
+        floatArray[0] = flt;
 
         this.add_bytes(bytes(0xca))
 
@@ -171,9 +173,9 @@ export class SparkCommandMessage {
         this.add_bytes(floatBytes)
     }
 
-    add_onoff(onoff) {
+    add_onoff(onoff: string | boolean) {
         let b: Uint8Array;
-        if (onoff == "On") {
+        if (onoff == "On" || onoff == true) {
             b = bytes(0xc3)
         }
         else {
@@ -197,7 +199,7 @@ export class SparkCommandMessage {
 
     request_info(sub_cmd) {
         const cmd = 0x02; // get
-    
+
         this.start_message(cmd, sub_cmd)
 
         this.add_bytes(bytes(0))
@@ -217,6 +219,17 @@ export class SparkCommandMessage {
         return this.end_message()
     }
 
+    change_amp_parameter(dspId: string, paramNumber: number, val:number) {
+        const cmd = 0x03
+        const sub_cmd = 0x37
+
+        this.start_message(cmd, sub_cmd)
+        this.add_prefixed_string(dspId)
+        this.add_bytes(bytes(paramNumber))
+        this.add_float(val)
+        return this.end_message()
+    }
+
     change_effect(pedal1, pedal2) {
         const cmd = 0x01
         const sub_cmd = 0x06
@@ -227,10 +240,31 @@ export class SparkCommandMessage {
         return this.end_message()
     }
 
+    change_amp(dspIdOld, dspIdNew) {
+        const cmd = 0x03
+        const sub_cmd = 0x06
+
+        this.start_message(cmd, sub_cmd)
+        this.add_prefixed_string(dspIdOld)
+        this.add_prefixed_string(dspIdNew)
+        return this.end_message()
+    }
+
     change_hardware_preset(preset_num) {
         //  preset_num is 0 to 3
         const cmd = 0x01
         const sub_cmd = 0x38
+
+        this.start_message(cmd, sub_cmd)
+        this.add_bytes(bytes(0))
+        this.add_bytes(bytes(preset_num))
+        return this.end_message()
+    }
+
+    store_current_preset(preset_num) {
+        //  preset_num is 0 to 3
+        const cmd = 0x03
+        const sub_cmd = 0x27
 
         this.start_message(cmd, sub_cmd)
         this.add_bytes(bytes(0))
@@ -285,6 +319,50 @@ export class SparkCommandMessage {
         }
 
         this.add_bytes(bytes(preset["End Filler"]))
+
+        return this.end_message()
+    }
+
+    create_preset_from_model(preset: Preset) {
+
+        const cmd = 0x01
+        const sub_cmd = 0x01
+
+        this.start_message(cmd, sub_cmd, true)
+
+        this.add_bytes(bytes([0x00, 0x7f]))
+        this.add_long_string(preset.meta.id)
+        this.add_string(preset.meta.name)
+        this.add_string(preset.meta.version ??"1")
+
+        let descr = preset.meta.description;
+
+        if (descr.length > 31) {
+            this.add_long_string(descr)
+        }
+        else {
+            this.add_string(descr)
+        }
+
+        this.add_string(preset.meta.icon ??"icon.png")
+        this.add_float(preset.bpm ?? 120)
+        this.add_bytes(bytes(0x90 + preset.sigpath.length))        //  always 7 pedals
+
+        for (let i = 0; i < preset.sigpath.length; i++) {
+            let fx = preset.sigpath[i];
+            this.add_string(fx.dspId)
+            this.add_onoff(fx.active)
+            let num_p = fx.params.length;
+            this.add_bytes(bytes(num_p + 0x90))
+            for (let p = 0; p < num_p; p++) {
+                this.add_bytes(bytes(p));
+                this.add_bytes(bytes(0x91));
+                this.add_float(fx.params[p].value);
+            }
+        }
+
+        //??
+        this.add_bytes(bytes(0))
 
         return this.end_message()
     }

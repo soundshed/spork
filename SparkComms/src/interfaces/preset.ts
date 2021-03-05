@@ -17,6 +17,7 @@ export interface FxParam {
     value: any;
     index: number;
     name?: string; // used in fx catalog to describe param in UI
+    type?: string;
 }
 
 export interface FxParamMessage extends FxParam {
@@ -39,8 +40,10 @@ export interface FxToggleMessage {
 export interface SignalPath {
     active: boolean;
     params: FxParam[];
-    type: string;
+    type?: string;
     dspId: string;
+    name?: string;
+    description?: string;
 }
 export interface DeviceState {
 
@@ -53,5 +56,19 @@ export interface FxCatalogItem {
     type: string;
     dspId: string;
     name: string;
+    description?: string;
     params: Array<FxParam>;
+    isExperimental?: boolean;
+}
+
+export interface FXCatalogItemType {
+    id: string;
+    name: string;
+    index: number;
+    description: string;
+    isExperimental?: boolean;
+}
+export interface FxCatalog {
+    types: Array<FXCatalogItemType>;
+    catalog: Array<FxCatalogItem>;
 }
