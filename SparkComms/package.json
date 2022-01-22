@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bluetooth-serial-port": "",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^3.1.1"
   },
   "devDependencies": {
     "tslint": "^5.12.1",
