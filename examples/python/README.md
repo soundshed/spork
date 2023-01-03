@@ -12,3 +12,6 @@
 
  Press 1,2,3,4 to change presets.
 
+-------
+
+For sporkble, pip install bleak

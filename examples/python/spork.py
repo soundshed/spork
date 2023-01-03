@@ -3,7 +3,7 @@ import time
 import traceback
 from pynput import keyboard # pip install pynput
 
-PI_ADDR = "00:00:00:00:00:00"  # set your Spork Audio 40 device address here
+PI_ADDR = "08:EB:ED:1E:36:D4"  # set your Spork Audio 40 device address here : SPark Mini:   08:EB:ED:1E:36:D4
 USB_BT_ADDR = ""
 PORT = 2
 

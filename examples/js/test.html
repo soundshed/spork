@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <script src="test.js"></script>
+        <script>
+            function runTest() {
+                let svc = new BluetoothService();
+                svc.GetSettings();
+            }
+        </script>
+    </head>
+    <body>
+
+        <button onclick="runTest()">Test</button>
+
+        <textarea id="log" style="width:100%; height:600px;"></textarea>
+    </body>
+</html>
