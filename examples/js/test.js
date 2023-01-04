@@ -83,14 +83,14 @@ class BluetoothService {
         this.log(`Setting Preset ${x}`)
         let cmd = `01fe000053fe1a000000000000000000f0013a15013800000${x}f7`;
         let data = new Uint8Array(this.hexToBytes(cmd));
-        await cmdCharacteristic.writeValueWithResponse(data);
+        await cmdCharacteristic.writeValueWithoutResponse(data);
         await this.sleepAsync(2000);
 
         // get preset
         this.log(`Getting Preset ${x}`)
         cmd = `01fe000053fe1b000000000000000000f0013a1502010000000${x}f7`;
         data = new Uint8Array(this.hexToBytes(cmd));
-        await cmdCharacteristic.writeValueWithResponse(data);
+        await cmdCharacteristic.writeValueWithoutResponse(data);
         await this.sleepAsync(1000);
 
       }
